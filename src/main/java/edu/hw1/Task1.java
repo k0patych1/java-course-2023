@@ -13,11 +13,11 @@ public final class Task1 {
             return -1;
         }
 
-        long minutes;
+        int minutes;
         int seconds;
 
         try {
-            minutes = Long.parseLong(splited[0]);
+            minutes = Integer.parseInt(splited[0]);
             seconds = Integer.parseInt(splited[1]);
         } catch (NumberFormatException exception) {
             return -1;
@@ -27,6 +27,6 @@ public final class Task1 {
             return -1;
         }
 
-        return minutes * secondsInMinute + seconds;
+        return (long) minutes * secondsInMinute + seconds;
     }
 }
