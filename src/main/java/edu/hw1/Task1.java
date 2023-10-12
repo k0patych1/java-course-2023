@@ -1,7 +1,7 @@
 package edu.hw1;
 
 public final class Task1 {
-    private static final int secondsInMinute = 60;
+    private static final int SECOND_IN_MINUTE = 60;
 
     private Task1() {}
 
@@ -22,10 +22,10 @@ public final class Task1 {
             return -1;
         }
 
-        if (minutes < 0 || seconds >= secondsInMinute || seconds < 0) {
+        if (minutes < 0 || seconds >= SECOND_IN_MINUTE || seconds < 0) {
             return -1;
         }
 
-        return (long) minutes * secondsInMinute + seconds;
+        return (long) minutes * SECOND_IN_MINUTE + seconds;
     }
 }
