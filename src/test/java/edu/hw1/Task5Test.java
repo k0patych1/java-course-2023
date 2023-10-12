@@ -3,6 +3,8 @@ package edu.hw1;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public final class Task5Test {
     @Test
@@ -11,7 +13,7 @@ public final class Task5Test {
         int number = 11211230;
         boolean receivedAns = Task5.isPalindromeDescendant(number);
 
-        assertThat(receivedAns).isEqualTo(true);
+        assertTrue(receivedAns);
     }
 
     @Test
@@ -20,7 +22,7 @@ public final class Task5Test {
         int number = 13001120;
         boolean receivedAns = Task5.isPalindromeDescendant(number);
 
-        assertThat(receivedAns).isEqualTo(true);
+        assertTrue(receivedAns);
     }
 
     @Test
@@ -29,7 +31,7 @@ public final class Task5Test {
         long number = 989897969594939291L;
         boolean receivedAns = Task5.isPalindromeDescendant(number);
 
-        assertThat(receivedAns).isEqualTo(false);
+        assertFalse(receivedAns);
     }
 
     @Test
@@ -39,7 +41,7 @@ public final class Task5Test {
 
         boolean receivedAns = Task5.isPalindromeDescendant(number);
 
-        assertThat(receivedAns).isEqualTo(true);
+        assertTrue(receivedAns);
     }
 
     @Test
@@ -49,6 +51,6 @@ public final class Task5Test {
 
         boolean receivedAns = Task5.isPalindromeDescendant(number);
 
-        assertThat(receivedAns).isEqualTo(true);
+        assertTrue(receivedAns);
     }
 }

@@ -1,8 +1,7 @@
 package edu.hw1;
 
 public final class Task1 {
-    @SuppressWarnings("MagicNumber")
-    static int secondsInMinute = 60;
+    private static final int secondsInMinute = 60;
 
     private Task1() {}
 

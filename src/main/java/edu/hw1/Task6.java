@@ -5,6 +5,10 @@ import java.util.Arrays;
 public final class Task6 {
     private Task6() {}
 
+    private static final int KAPREKARS_CONSTANT = 6174;
+    private static final int ENTRY_NUMBER_MAX_VALUE = 9999;
+    private static final int ENTRY_NUMBER_MIN_VALUE = 1001;
+
     @SuppressWarnings("MagicNumber")
     private static long newNumber(long number) {
         char[] charArray = Long.toString(number).toCharArray();
@@ -29,9 +33,8 @@ public final class Task6 {
         return true;
     }
 
-    @SuppressWarnings("MagicNumber")
     public static int countK(long entryNumber) throws IllegalArgumentException {
-        if (entryNumber <= 1000 || entryNumber >= 10000) {
+        if (entryNumber < ENTRY_NUMBER_MIN_VALUE || entryNumber > ENTRY_NUMBER_MAX_VALUE) {
             throw new IllegalArgumentException("Entry number must be four digits and not equal to 1000");
         }
 
@@ -43,7 +46,7 @@ public final class Task6 {
 
         int count = 0;
 
-        while (number != 6174) {
+        while (number != KAPREKARS_CONSTANT) {
             number = newNumber(number);
             ++count;
         }

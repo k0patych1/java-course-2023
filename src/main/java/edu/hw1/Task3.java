@@ -14,7 +14,6 @@ public final class Task3 {
         OptionalInt maxOfArr = Arrays.stream(arr).max();
 
         try {
-
             return minOfNestedArr.getAsInt() > minOfArr.getAsInt()
                 && maxOfNestedArr.getAsInt() < maxOfArr.getAsInt();
         } catch (NoSuchElementException exception) {

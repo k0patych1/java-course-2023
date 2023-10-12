@@ -3,16 +3,16 @@ package edu.hw1;
 public final class Task8 {
     private Task8() {}
 
-    private static final String BOARD_SIZE_EXCEPTION_DESCRIPTION = "The number must be positive";
+    private static final int BOARD_SIZE = 8;
+    private static final String BOARD_SIZE_EXCEPTION_DESCRIPTION = "The board must be BOARD_SIZE*BOARD_SIZE";
 
-    @SuppressWarnings("MagicNumber")
     private static boolean isCorrectArrangement(int x, int y) {
-        return x >= 0 && x < 8 && y >= 0 && y < 8;
+        return x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE;
     }
 
     @SuppressWarnings("MagicNumber")
     public static boolean knightBoardCapture(int[][] board) throws IllegalArgumentException {
-        if (board.length != 8) {
+        if (board.length != BOARD_SIZE) {
             throw new IllegalArgumentException(BOARD_SIZE_EXCEPTION_DESCRIPTION);
         }
 
@@ -27,12 +27,12 @@ public final class Task8 {
             {-1, -2}
         };
 
-        for (int x = 0; x < 8; ++x) {
-            if (board[x].length != 8) {
+        for (int x = 0; x < BOARD_SIZE; ++x) {
+            if (board[x].length != BOARD_SIZE) {
                 throw new IllegalArgumentException(BOARD_SIZE_EXCEPTION_DESCRIPTION);
             }
 
-            for (int y = 0; y < 8; ++y) {
+            for (int y = 0; y < BOARD_SIZE; ++y) {
                 if (board[x][y] != 1) {
                     continue;
                 }
