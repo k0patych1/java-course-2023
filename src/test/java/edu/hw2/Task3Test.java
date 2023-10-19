@@ -22,8 +22,8 @@ public final class Task3Test {
             String out = executor.getLoggerInformation();
 
             assertThat(out).isEqualTo("Connection was closed\n");
-            assertThat(e.getMessage()).isEqualTo("The number of attempts to execute a command has been exceeded\n");
-            assertTrue(e.getCause().toString().contains("Failed to execute command on server\n"));
+            assertThat(e.getMessage()).isEqualTo("The number of attempts to execute a command has been exceeded");
+            assertTrue(e.getCause().toString().contains("Failed to execute command on server"));
 
             return;
         }
