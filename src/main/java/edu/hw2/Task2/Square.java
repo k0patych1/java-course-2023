@@ -5,13 +5,16 @@ public class Square extends Rectangle {
         super(side, side);
     }
 
+    public Square() {
+        super(0, 0);
+    }
     @Override
     public Rectangle setWidth(int newWidth) {
-        return new Square(newWidth);
+        return new Rectangle(newWidth, height);
     }
 
     @Override
     public Rectangle setHeight(int newHeight) {
-        return new Square(newHeight);
+        return new Rectangle(width, newHeight);
     }
 }

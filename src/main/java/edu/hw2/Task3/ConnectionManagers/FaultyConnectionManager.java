@@ -10,13 +10,10 @@ public class FaultyConnectionManager implements IConnectionManager {
         connection = new FaultyConnection();
     }
 
-    public IConnection createConnection() {
+    @Override
+    public IConnection getConnection() {
         connection = new FaultyConnection();
 
-        return connection;
-    }
-
-    public IConnection getConnection() {
         return connection;
     }
 }

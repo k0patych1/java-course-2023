@@ -27,9 +27,10 @@ public final class PopularCommandExecutor {
 
     void tryExecute(String command) throws ExceedingConnectionAttemptsException {
         int attempts = 0;
-        IConnection curConnection = manager.getConnection();
 
         while (true) {
+            IConnection curConnection = manager.getConnection();
+
             try {
                 curConnection.execute(command);
             } catch (ConnectionException exception) {
@@ -55,5 +56,4 @@ public final class PopularCommandExecutor {
     public String getLoggerInformation() {
         return loggerInformation;
     }
-
 }

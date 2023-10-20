@@ -8,11 +8,7 @@ import java.util.Random;
 public class DefaultConnectionManager implements IConnectionManager {
     private IConnection connection;
 
-    public DefaultConnectionManager() {
-        createConnection();
-    }
-
-    public IConnection createConnection() {
+    private void createConnection() {
         Random random = new Random();
         boolean isStableIConnection = random.nextBoolean();
 
@@ -21,12 +17,16 @@ public class DefaultConnectionManager implements IConnectionManager {
         } else {
             connection =  new FaultyConnection();
         }
+    }
 
-        return connection;
+    public DefaultConnectionManager() {
+        createConnection();
     }
 
     @Override
     public IConnection getConnection() {
+        createConnection();
+
         return connection;
     }
 }
