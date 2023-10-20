@@ -8,6 +8,7 @@ public class Square extends Rectangle {
     public Square() {
         super(0, 0);
     }
+
     @Override
     public Rectangle setWidth(int newWidth) {
         return new Rectangle(newWidth, height);
