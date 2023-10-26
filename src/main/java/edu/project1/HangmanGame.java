@@ -4,19 +4,24 @@ import org.jetbrains.annotations.NotNull;
 
 public class HangmanGame {
     private static final char END_GAME = '\u0004';
+    private static final char HIDDEN_LETTER = '*';
 
     private final ConsoleHangmanManager consoleHangmanManager;
 
-    HangmanGame() {
+    public HangmanGame() {
         consoleHangmanManager = new ConsoleHangmanManager();
     }
 
-    HangmanGame(String attempts) {
+    public HangmanGame(String attempts) {
         consoleHangmanManager = new ConsoleHangmanManager(attempts);
     }
 
+    @SuppressWarnings("ReturnCount")
     public void run(@NotNull IDictionary dictionary) throws EnumConstantNotPresentException {
-        Session session = new Session(dictionary.randomWord().toCharArray());
+        char[] hiddenWord = dictionary.randomWord().toCharArray();
+
+        Session session = new Session(hiddenWord);
+        consoleHangmanManager.showStartOfGame(session.guessedPartOfWord);
 
         while (consoleHangmanManager.isGetLetter()) {
             Character letter = consoleHangmanManager.letter();
@@ -31,46 +36,47 @@ public class HangmanGame {
 
             GuessResult guessResult = guessResult(session, letter);
 
-            boolean isGameEnded = false;
-
             switch (guessResult) {
-                case SuccessAttempt -> consoleHangmanManager.showSuccessAttempt(session.outWord);
-                case WrongAttempt -> consoleHangmanManager.showWrongAttempt(
-                    session.outWord, session.attempts, Session.MAX_ATTEMPTS);
-                case Loose -> {
+                case SUCCESS_ATTEMPT -> consoleHangmanManager.showSuccessAttempt(session.guessedPartOfWord);
+                case WRONG_ATTEMPT -> consoleHangmanManager.showWrongAttempt(
+                    session.guessedPartOfWord, session.numOfAttempts, session.maxAttempts);
+                case LOOSE -> {
                     consoleHangmanManager.showLoose(
-                        session.outWord, session.attempts, Session.MAX_ATTEMPTS);
-                    isGameEnded = true;
+                        session.guessedPartOfWord, session.hiddenWord, session.numOfAttempts, session.maxAttempts);
+                    return;
                 }
                 case WIN -> {
-                    consoleHangmanManager.showWin(session.outWord);
-                    isGameEnded = true;
-                }
+                    consoleHangmanManager.showWin(session.guessedPartOfWord);
+                    return;
+                } case LETTER_ALREADY_CHECKED -> consoleHangmanManager.showRetry(letter);
 
                 default -> throw new EnumConstantNotPresentException(guessResult.getClass(), guessResult.name());
-            }
-
-            if (isGameEnded) {
-                return;
             }
 
             consoleHangmanManager.requestLetter();
         }
     }
 
+    @SuppressWarnings("ReturnCount")
     private static GuessResult guessResult(@NotNull Session session,  char letter) {
+        if (session.attempts.contains(letter)) {
+            return GuessResult.LETTER_ALREADY_CHECKED;
+        } else {
+            session.attempts.add(letter);
+        }
+
         boolean isSuccessAttempt = false;
         boolean isWon = true;
 
-        int lengthOfWord = session.word.length;
+        int lengthOfWord = session.hiddenWord.length;
 
         for (int i = 0; i < lengthOfWord; ++i) {
-            if (session.word[i] == letter) {
+            if (session.hiddenWord[i] == letter) {
                 isSuccessAttempt = true;
-                session.outWord[i] = letter;
+                session.guessedPartOfWord[i] = letter;
             }
 
-            if (session.outWord[i] == '*') {
+            if (session.guessedPartOfWord[i] == HIDDEN_LETTER) {
                 isWon = false;
             }
         }
@@ -80,15 +86,15 @@ public class HangmanGame {
                 return GuessResult.WIN;
             }
 
-            return GuessResult.SuccessAttempt;
+            return GuessResult.SUCCESS_ATTEMPT;
         }
 
-        ++session.attempts;
+        ++session.numOfAttempts;
 
-        if (session.attempts == Session.MAX_ATTEMPTS) {
-            return GuessResult.Loose;
+        if (session.numOfAttempts == session.maxAttempts) {
+            return GuessResult.LOOSE;
         }
 
-        return GuessResult.WrongAttempt;
+        return GuessResult.WRONG_ATTEMPT;
     }
 }

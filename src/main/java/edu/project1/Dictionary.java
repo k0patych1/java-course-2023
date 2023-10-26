@@ -6,9 +6,9 @@ import org.jetbrains.annotations.NotNull;
 public class Dictionary implements IDictionary {
     private String[] words = new String[] {"capybara", "dopsa", "cadillac"};
 
-    Dictionary() {}
+    public Dictionary() {}
 
-    Dictionary(String[] words) {
+    public Dictionary(String[] words) {
         this.words = words;
     }
 

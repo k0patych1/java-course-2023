@@ -1,28 +1,32 @@
 package edu.project1;
 
 import java.util.Arrays;
+import java.util.HashSet;
 
 public class Session {
-    public char[] word;
+    public final int maxAttempts = 5;
 
-    int lengthOfWord;
+    public char[] hiddenWord;
 
-    public static final int MAX_ATTEMPTS = 5;
+    public int lengthOfWord;
 
-    public int attempts;
+    public int numOfAttempts;
 
-    public char[] outWord;
+    public HashSet<Character> attempts;
 
-    public Session(char[] word) {
+    public char[] guessedPartOfWord;
+
+    public Session(char[] word) throws IllegalArgumentException {
         lengthOfWord = word.length;
 
         if (lengthOfWord == 0) {
             throw new IllegalArgumentException("Word's length can't be zero");
         }
 
-        this.word = word;
-        this.attempts = 0;
-        outWord = new char[word.length];
-        Arrays.fill(outWord, '*');
+        this.hiddenWord = word;
+        this.numOfAttempts = 0;
+        attempts = new HashSet<>();
+        guessedPartOfWord = new char[word.length];
+        Arrays.fill(guessedPartOfWord, '*');
     }
 }

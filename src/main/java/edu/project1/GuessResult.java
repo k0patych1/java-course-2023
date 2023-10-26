@@ -1,8 +1,9 @@
 package edu.project1;
 
 public enum GuessResult {
-    SuccessAttempt,
-    WrongAttempt,
+    SUCCESS_ATTEMPT,
+    WRONG_ATTEMPT,
     WIN,
-    Loose
+    LOOSE,
+    LETTER_ALREADY_CHECKED
 }

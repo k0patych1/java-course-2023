@@ -36,6 +36,8 @@ public class Project1Test {
                 """;
 
         String expectedGame = """
+                Hello and welcome to Hangman!
+                The word: ****
                 Guess a letter:\s
                 Missed, mistake 1 of 5
                 The word: ****
@@ -55,6 +57,7 @@ public class Project1Test {
                 Missed, mistake 5 of 5
                 The word: *e**
                 You lost!
+                The word was test
                 """;
 
         String receivedOutGame = tapSystemOut(() -> {
@@ -79,6 +82,8 @@ public class Project1Test {
                 """;
 
         String expectedGame = """
+                Hello and welcome to Hangman!
+                The word: ****
                 Guess a letter:\s
                 Missed, mistake 1 of 5
                 The word: ****
@@ -110,6 +115,8 @@ public class Project1Test {
                 """;
 
         String expectedGame = """
+                Hello and welcome to Hangman!
+                The word: ****
                 Guess a letter:\s
                 Missed, mistake 1 of 5
                 The word: ****
