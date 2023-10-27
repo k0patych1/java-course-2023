@@ -1,26 +1,24 @@
-package edu.hw2.Task3;
+package edu.hw2.task3;
 
-import edu.hw2.Task3.ConnectionManagers.IConnectionManager;
-import edu.hw2.Task3.Connections.IConnection;
-import edu.hw2.Task3.Exceptions.ConnectionException;
-import edu.hw2.Task3.Exceptions.ExceedingConnectionAttemptsException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import edu.hw2.task3.connectionManagers.IConnectionManager;
+import edu.hw2.task3.connections.IConnection;
+import edu.hw2.task3.exceptions.ConnectionException;
+import edu.hw2.task3.exceptions.ExceedingConnectionAttemptsException;
 
 public final class PopularCommandExecutor {
     private final IConnectionManager manager;
 
-    private static String loggerInformation = "";
-
     private final int maxAttempts;
-
-    private final static Logger LOGGER = LogManager.getLogger();
 
     public void updatePackages() throws ExceedingConnectionAttemptsException {
         tryExecute("apt update && apt upgrade -y");
     }
 
     public PopularCommandExecutor(IConnectionManager manager, int maxAttempts) {
+        if (maxAttempts < 1) {
+            throw new IllegalArgumentException("Max attempts can't be less than 1");
+        }
+
         this.manager = manager;
         this.maxAttempts = maxAttempts;
     }
@@ -29,15 +27,11 @@ public final class PopularCommandExecutor {
         int attempts = 0;
 
         while (true) {
-            IConnection curConnection = manager.getConnection();
-
-            try {
+            try (IConnection curConnection = manager.getConnection()) {
                 curConnection.execute(command);
             } catch (ConnectionException exception) {
                 ++attempts;
                 if (attempts >= maxAttempts) {
-                    curConnection.close();
-                    loggerInformation += curConnection.getLoggerInformation();
                     throw new ExceedingConnectionAttemptsException(
                             "The number of attempts to execute a command has been exceeded",
                             exception);
@@ -46,14 +40,7 @@ public final class PopularCommandExecutor {
                 continue;
             }
 
-            curConnection.close();
-            loggerInformation += curConnection.getLoggerInformation();
-
             break;
         }
-    }
-
-    public String getLoggerInformation() {
-        return loggerInformation;
     }
 }
