@@ -2,8 +2,8 @@ package edu.project1;
 
 import org.jetbrains.annotations.NotNull;
 
-public class HangmanGame {
-    private static final char END_GAME = '\u0004';
+public class HangmanGame implements AutoCloseable {
+    private static final char FORCE_END_GAME = '\u0004';
     private static final char HIDDEN_LETTER = '*';
 
     private final ConsoleHangmanManager consoleHangmanManager;
@@ -16,7 +16,6 @@ public class HangmanGame {
         consoleHangmanManager = new ConsoleHangmanManager(attempts);
     }
 
-    @SuppressWarnings("ReturnCount")
     public void run(@NotNull IDictionary dictionary) throws EnumConstantNotPresentException {
         char[] hiddenWord = dictionary.randomWord().toCharArray();
 
@@ -30,27 +29,12 @@ public class HangmanGame {
                 continue;
             }
 
-            if (letter == END_GAME) {
-                break;
-            }
-
             GuessResult guessResult = guessResult(session, letter);
 
-            switch (guessResult) {
-                case SUCCESS_ATTEMPT -> consoleHangmanManager.showSuccessAttempt(session.guessedPartOfWord);
-                case WRONG_ATTEMPT -> consoleHangmanManager.showWrongAttempt(
-                    session.guessedPartOfWord, session.numOfAttempts, session.maxAttempts);
-                case LOOSE -> {
-                    consoleHangmanManager.showLoose(
-                        session.guessedPartOfWord, session.hiddenWord, session.numOfAttempts, session.maxAttempts);
-                    return;
-                }
-                case WIN -> {
-                    consoleHangmanManager.showWin(session.guessedPartOfWord);
-                    return;
-                } case LETTER_ALREADY_CHECKED -> consoleHangmanManager.showRetry(letter);
+            showToUser(guessResult, session, letter);
 
-                default -> throw new EnumConstantNotPresentException(guessResult.getClass(), guessResult.name());
+            if (isGameEnded(guessResult)) {
+                return;
             }
 
             consoleHangmanManager.requestLetter();
@@ -59,10 +43,12 @@ public class HangmanGame {
 
     @SuppressWarnings("ReturnCount")
     private static GuessResult guessResult(@NotNull Session session,  char letter) {
-        if (session.attempts.contains(letter)) {
+        if (letter == FORCE_END_GAME) {
+           return GuessResult.FORCE_END_GAME;
+        }
+
+        if (!session.attempts.add(letter)) {
             return GuessResult.LETTER_ALREADY_CHECKED;
-        } else {
-            session.attempts.add(letter);
         }
 
         boolean isSuccessAttempt = false;
@@ -96,5 +82,38 @@ public class HangmanGame {
         }
 
         return GuessResult.WRONG_ATTEMPT;
+    }
+
+    private boolean isGameEnded(GuessResult guessResult) {
+        switch (guessResult) {
+            case LOOSE, WIN, FORCE_END_GAME -> {
+                return true;
+            }
+            case SUCCESS_ATTEMPT, WRONG_ATTEMPT, LETTER_ALREADY_CHECKED -> {
+                return false;
+            }
+            default -> throw new EnumConstantNotPresentException(guessResult.getClass(), guessResult.name());
+        }
+    }
+
+    private void showToUser(GuessResult guessResult, Session session, char letter)
+        throws EnumConstantNotPresentException {
+        switch (guessResult) {
+            case SUCCESS_ATTEMPT -> consoleHangmanManager.showSuccessAttempt(session.guessedPartOfWord);
+            case WRONG_ATTEMPT -> consoleHangmanManager.showWrongAttempt(
+                session.guessedPartOfWord, session.numOfAttempts, session.maxAttempts);
+            case LOOSE -> consoleHangmanManager.showLoose(
+                    session.guessedPartOfWord, session.hiddenWord, session.numOfAttempts, session.maxAttempts);
+            case WIN -> consoleHangmanManager.showWin(session.guessedPartOfWord);
+            case LETTER_ALREADY_CHECKED -> consoleHangmanManager.showRetry(letter);
+            case FORCE_END_GAME -> consoleHangmanManager.showHiddenWord(session.hiddenWord);
+
+            default -> throw new EnumConstantNotPresentException(guessResult.getClass(), guessResult.name());
+        }
+    }
+
+    @Override
+    public void close() {
+        consoleHangmanManager.close();
     }
 }

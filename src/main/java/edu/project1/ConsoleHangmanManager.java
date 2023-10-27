@@ -78,7 +78,7 @@ public class ConsoleHangmanManager implements AutoCloseable {
         System.out.println(outWord);
     }
 
-    private void showHiddenWord(char[] hiddenWord) {
+    public void showHiddenWord(char[] hiddenWord) {
         System.out.print("The word was ");
         System.out.println(hiddenWord);
     }

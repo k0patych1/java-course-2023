@@ -91,6 +91,7 @@ public class Project1Test {
                 Hit!
                 The word: *e**
                 Guess a letter:\s
+                The word was test
                 """;
 
         String receivedOutGame = tapSystemOut(() -> {

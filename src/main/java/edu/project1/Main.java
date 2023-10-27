@@ -10,5 +10,6 @@ public final class Main {
         HangmanGame hangmanGame = new HangmanGame();
 
         hangmanGame.run(dictionary);
+        hangmanGame.close();
     }
 }
