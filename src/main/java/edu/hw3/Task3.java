@@ -9,9 +9,7 @@ public final class Task3 {
 
     public static <T> Map<T, Integer> freqDict(List<T> objs) {
         Map<T, Integer> freqDict = new HashMap<>();
-        for (T obj : objs) {
-            freqDict.put(obj, freqDict.getOrDefault(obj, 0) + 1);
-        }
+        objs.forEach(obj -> freqDict.merge(obj, 1, Integer::sum));
 
         return freqDict;
     }
