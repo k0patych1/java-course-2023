@@ -44,5 +44,7 @@ public class Cell {
         col = coordinate.col();
     }
 
-    public enum Type { WALL, PASSAGE}
+    public enum Type {
+        WALL, PASSAGE
+    }
 }
