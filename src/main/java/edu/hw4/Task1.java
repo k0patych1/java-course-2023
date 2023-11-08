@@ -9,7 +9,7 @@ public final class Task1 {
 
     public static List<Animal> sortAnimalsAsc(Collection<Animal> animals) {
         return animals.stream()
-            .sorted(Comparator.comparingInt(Animal::height).reversed())
+            .sorted(Comparator.comparingInt(Animal::height))
             .toList();
     }
 }

@@ -18,9 +18,9 @@ public class Task1Test {
             new Animal("Archi", Animal.Type.DOG, Animal.Sex.M, 5, 120, 15, false),
             new Animal("Aboba", Animal.Type.FISH, Animal.Sex.F, 1, 5, 0, false))))
             .isEqualTo(List.of(
-                new Animal("Archi", Animal.Type.DOG, Animal.Sex.M, 5, 120, 15, false),
+                new Animal("Aboba", Animal.Type.FISH, Animal.Sex.F, 1, 5, 0, false),
                 new Animal("Emos", Animal.Type.CAT, Animal.Sex.M, 9, 80, 8, true),
-                new Animal("Aboba", Animal.Type.FISH, Animal.Sex.F, 1, 5, 0, false)));
+                new Animal("Archi", Animal.Type.DOG, Animal.Sex.M, 5, 120, 15, false)));
     }
 
     @Test
@@ -31,10 +31,10 @@ public class Task1Test {
             new Animal("Золотая рыбка", Animal.Type.FISH, Animal.Sex.F, 1, 5, 0, false),
             new Animal("Собака-улыбака", Animal.Type.DOG, Animal.Sex.M, 1, 120, 15, false))))
             .isEqualTo(List.of(
-                new Animal("Archi", Animal.Type.DOG, Animal.Sex.M, 5, 120, 15, false),
-                new Animal("Собака-улыбака", Animal.Type.DOG, Animal.Sex.M, 1, 120, 15, false),
+                new Animal("Золотая рыбка", Animal.Type.FISH, Animal.Sex.F, 1, 5, 0, false),
                 new Animal("Emos", Animal.Type.CAT, Animal.Sex.M, 9, 80, 8, true),
-                new Animal("Золотая рыбка", Animal.Type.FISH, Animal.Sex.F, 1, 5, 0, false)));
+                new Animal("Archi", Animal.Type.DOG, Animal.Sex.M, 5, 120, 15, false),
+                new Animal("Собака-улыбака", Animal.Type.DOG, Animal.Sex.M, 1, 120, 15, false)));
     }
 }
 

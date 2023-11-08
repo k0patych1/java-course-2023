@@ -13,7 +13,8 @@ public final class Task7 {
 
         return animals.stream()
             .sorted(Comparator.comparingInt(Animal::age).reversed())
-            .toList()
-            .get(k - 1);
+            .skip(k - 1)
+            .findFirst()
+            .orElse(null);
     }
 }

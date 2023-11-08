@@ -9,10 +9,8 @@ public final class Task20 {
 
     public static Map<String, String> findInvalidAnimalsStringVersion(Collection<Animal> animals) {
         return animals.stream()
-            .filter(Task19::hasErrors)
-            .collect(Collectors.toMap(Animal::name, animal ->
-                Task19.getErrors(animal).stream()
-                .map(Task19.ValidationError::toString)
-                .collect(Collectors.joining("\n"))));
+            .flatMap(animal -> Task19.getErrors(animal).stream()
+                .map(error -> Map.entry(animal.name(), error.toString())))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> v1 + "\n" + v2));
     }
 }

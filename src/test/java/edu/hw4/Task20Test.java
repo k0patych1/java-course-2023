@@ -2,7 +2,6 @@ package edu.hw4;
 
 import org.junit.jupiter.api.Test;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import static edu.hw4.Task20.findInvalidAnimalsStringVersion;

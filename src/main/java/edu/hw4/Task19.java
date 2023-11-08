@@ -1,23 +1,25 @@
 package edu.hw4;
 
+import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class Task19 {
     private Task19() {}
 
     public static Map<String, Set<ValidationError>> findInvalidAnimals(Collection<Animal> animals) {
         return animals.stream()
-            .filter(Task19::hasErrors)
-            .collect(Collectors.toMap(Animal::name, Task19::getErrors));
-    }
-
-    public static boolean hasErrors(Animal animal) {
-        Set<ValidationError> errors = getErrors(animal);
-        return !errors.isEmpty();
+            .flatMap(animal -> {
+                Set<ValidationError> errors = getErrors(animal);
+                return errors.isEmpty()
+                    ? Stream.empty()
+                    : Stream.of(new AbstractMap.SimpleEntry<>(animal.name(), errors));
+            })
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     public static Set<ValidationError> getErrors(Animal animal) {
