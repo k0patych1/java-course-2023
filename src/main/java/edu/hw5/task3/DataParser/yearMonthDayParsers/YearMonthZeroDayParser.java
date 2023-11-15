@@ -14,14 +14,6 @@ public class YearMonthZeroDayParser extends DateParser {
 
     @Override
     public Optional<LocalDate> parseDate(String strDate) {
-        try {
-            return Optional.of(LocalDate.parse(strDate, FORMATTER));
-        } catch (Exception e) {
-            if (nextParser != null) {
-                return nextParser.parseDate(strDate);
-            }
-
-            return Optional.empty();
-        }
+        return parseDateWithFormatter(strDate, FORMATTER);
     }
 }

@@ -33,10 +33,11 @@ public final class Task2 {
 
     public static LocalDate findNextFriday13th(LocalDate date) {
         TemporalAdjuster nextFriday13Adjuster = TemporalAdjusters.ofDateAdjuster(t -> {
-            LocalDate nextDate = t.plusDays(1);
-            while (nextDate.getDayOfMonth() != UNLUCKY_NUMBER || nextDate.getDayOfWeek() != DayOfWeek.FRIDAY) {
-                nextDate = nextDate.plusDays(1);
-            }
+            LocalDate nextDate = t;
+            do {
+                nextDate = nextDate.plusDays(1);;
+            } while (nextDate.getDayOfMonth() != UNLUCKY_NUMBER || nextDate.getDayOfWeek() != DayOfWeek.FRIDAY);
+
             return nextDate;
         });
 

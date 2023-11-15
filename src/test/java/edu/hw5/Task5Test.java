@@ -11,8 +11,9 @@ public class Task5Test {
         return new Arguments[]{
             Arguments.of("А123ВЕ777"),
             Arguments.of("Р777ОК177"),
-            Arguments.of("В777УХ777"),
+            Arguments.of("В777УХ000"),
             Arguments.of("В777ОР77"),
+            Arguments.of("В001ОР77"),
         };
     }
 
@@ -21,7 +22,8 @@ public class Task5Test {
             Arguments.of("123АВЕ777"),
             Arguments.of("А123ВГ77"),
             Arguments.of("А123ВЕ7777"),
-            Arguments.of("А123Вй777")
+            Arguments.of("А123В777"),
+            Arguments.of("В000ОР77"),
         };
     }
 

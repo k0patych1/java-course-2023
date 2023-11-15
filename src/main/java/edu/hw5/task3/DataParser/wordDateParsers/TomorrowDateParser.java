@@ -18,10 +18,6 @@ public class TomorrowDateParser extends DateParser {
             return Optional.of(currentDate.plusDays(1));
         }
 
-        if (nextParser != null) {
-            return nextParser.parseDate(strDate);
-        }
-
-        return Optional.empty();
+        return tryParseNext(strDate);
     }
 }

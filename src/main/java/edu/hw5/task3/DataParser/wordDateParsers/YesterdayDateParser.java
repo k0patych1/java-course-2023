@@ -18,10 +18,6 @@ public class YesterdayDateParser extends DateParser {
             return Optional.of(currentDate.minusDays(1));
         }
 
-        if (nextParser != null) {
-            return nextParser.parseDate(strDate);
-        }
-
-        return Optional.empty();
+        return tryParseNext(strDate);
     }
 }

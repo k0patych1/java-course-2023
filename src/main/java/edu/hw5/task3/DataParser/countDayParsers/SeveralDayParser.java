@@ -24,10 +24,6 @@ public class SeveralDayParser extends DateParser {
             return Optional.of(currentDate.minusDays(daysAgo));
         }
 
-        if (nextParser != null) {
-            return nextParser.parseDate(strDate);
-        }
-
-        return Optional.empty();
+        return tryParseNext(strDate);
     }
 }

@@ -18,10 +18,6 @@ public class OneDayParser extends DateParser {
             return Optional.of(localDate.minusDays(1));
         }
 
-        if (nextParser != null) {
-            return nextParser.parseDate(strDate);
-        }
-
-        return Optional.empty();
+        return tryParseNext(strDate);
     }
 }
