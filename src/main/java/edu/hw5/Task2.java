@@ -35,7 +35,7 @@ public final class Task2 {
         TemporalAdjuster nextFriday13Adjuster = TemporalAdjusters.ofDateAdjuster(t -> {
             LocalDate nextDate = t;
             do {
-                nextDate = nextDate.plusDays(1);;
+                nextDate = nextDate.plusDays(1);
             } while (nextDate.getDayOfMonth() != UNLUCKY_NUMBER || nextDate.getDayOfWeek() != DayOfWeek.FRIDAY);
 
             return nextDate;
