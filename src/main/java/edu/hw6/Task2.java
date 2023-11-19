@@ -1,5 +1,6 @@
 package edu.hw6;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,7 +12,11 @@ public final class Task2 {
 
     private Task2() {}
 
-    public static Path cloneFile(Path path) {
+    public static Path cloneFile(Path path) throws FileNotFoundException {
+        if (!path.toFile().exists()) {
+            throw new FileNotFoundException("Couldn't find the file to copy");
+        }
+
         String fileName = path.getFileName().toString();
         String extension = "";
 

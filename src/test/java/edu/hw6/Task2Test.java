@@ -1,11 +1,9 @@
 package edu.hw6;
 
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.io.TempDir;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -13,54 +11,54 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.io.CleanupMode.NEVER;
-
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 
 public class Task2Test {
-    @TempDir(cleanup = NEVER) Path tempDir;
+    @TempDir Path tempDir;
 
-    Path cloningPath = null;
+    Path cloningFile;
 
-    @Test
-    @Order(1)
-    public void singleCloneFileTest() throws IOException {
-        cloningPath = tempDir.resolve("Tinkoff Bank Biggest Secret.txt");
-        var file = Files.createFile(cloningPath);
+    @BeforeEach
+    public void setUp() throws IOException {
+        var cloningPath = tempDir.resolve("Tinkoff Bank Biggest Secret.txt");
+        cloningFile = Files.createFile(cloningPath);
 
-        FileWriter fileWriter = new FileWriter(file.toFile());
+        FileWriter fileWriter = new FileWriter(cloningFile.toFile());
         PrintWriter printWriter = new PrintWriter(fileWriter);
 
         printWriter.println("Hello, world!");
         printWriter.println("Goodbye, world!");
-        assertTrue(Files.exists(file));
+    }
 
-        var firstCopy = Task2.cloneFile(cloningPath);
-        assertTrue(Files.exists(file.resolveSibling("Tinkoff Bank Biggest Secret — копия.txt")));
+    @Test
+    public void singleCloneFileTest() throws FileNotFoundException {
+        assertTrue(Files.exists(cloningFile));
+
+        var firstCopy = Task2.cloneFile(cloningFile);
+        assertTrue(Files.exists(cloningFile.resolveSibling("Tinkoff Bank Biggest Secret — копия.txt")));
 
         try {
-            byte[] fileContent = Files.readAllBytes(file);
+            byte[] fileContent = Files.readAllBytes(cloningFile);
             byte[] copyFileContent = Files.readAllBytes(firstCopy);
 
             assertArrayEquals(fileContent, copyFileContent);
-        } catch (IOException ignored) {
-        }
+        } catch (IOException ignored) {}
     }
 
     @Test
-    @Order(2)
-    public void secondCloneFileTest() {
-        Task2.cloneFile(cloningPath);
-        assertTrue(Files.exists(cloningPath.resolveSibling("Tinkoff Bank Biggest Secret — копия (2).txt")));
+    public void severalClonesFileTest() throws FileNotFoundException {
+        Task2.cloneFile(cloningFile);
+        assertTrue(Files.exists(cloningFile.resolveSibling("Tinkoff Bank Biggest Secret — копия.txt")));
+        Task2.cloneFile(cloningFile);
+        assertTrue(Files.exists(cloningFile.resolveSibling("Tinkoff Bank Biggest Secret — копия (2).txt")));
+        Task2.cloneFile(cloningFile);
+        assertTrue(Files.exists(cloningFile.resolveSibling("Tinkoff Bank Biggest Secret — копия (3).txt")));
     }
 
     @Test
-    @Order(3)
-    public void thirdCloneFileTest() {
-        Task2.cloneFile(cloningPath);
-        assertTrue(Files.exists(cloningPath.resolveSibling("Tinkoff Bank Biggest Secret — копия (3).txt")));
+    public void noCopyingFileTest() {
+        assertThrows(FileNotFoundException.class, () -> Task2.cloneFile(Path.of("noFile.txt")));
     }
 }
 
