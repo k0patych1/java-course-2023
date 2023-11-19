@@ -15,21 +15,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class Task6Test {
     @Test
     public void portStatusTest() {
-        try (ServerSocket serverSocket = new ServerSocket(81);) {
-            assertFalse(PortScanner.isTcpOpen(81));
-            assertTrue(PortScanner.isUdpOpen(81));
+        try (ServerSocket serverSocket = new ServerSocket(4000);) {
+            assertFalse(PortScanner.isTcpOpen(4000));
+            assertTrue(PortScanner.isUdpOpen(4000));
         } catch (IOException ignored) {
 
         }
 
-        try(DatagramSocket datagramSocket = new DatagramSocket(81);) {
-            assertTrue(PortScanner.isTcpOpen(81));
-            assertFalse(PortScanner.isUdpOpen(81));
+        try(DatagramSocket datagramSocket = new DatagramSocket(4000);) {
+            assertTrue(PortScanner.isTcpOpen(4000));
+            assertFalse(PortScanner.isUdpOpen(4000));
         } catch (SocketException ignored) {
         }
 
-        assertTrue(PortScanner.isTcpOpen(81));
-        assertTrue(PortScanner.isUdpOpen(81));
+        assertTrue(PortScanner.isTcpOpen(4000));
+        assertTrue(PortScanner.isUdpOpen(4000));
     }
 
     @Test
@@ -38,6 +38,6 @@ public class Task6Test {
         int maxPort = 49151;
 
         assertThat(ports.size()).isEqualTo(maxPort + 1);
-        assertThat(ports.get(81)).isEqualTo(new PortInfo(81, "UDP|TCP", false));
+        assertThat(ports.get(81)).isEqualTo(new PortInfo(4000, "UDP|TCP", false));
     }
 }
