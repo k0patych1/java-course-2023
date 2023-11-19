@@ -38,6 +38,6 @@ public class Task6Test {
         int maxPort = 49151;
 
         assertThat(ports.size()).isEqualTo(maxPort + 1);
-        assertThat(ports.get(81)).isEqualTo(new PortInfo(4000, "UDP|TCP", false));
+        assertThat(ports.get(4000)).isEqualTo(new PortInfo(4000, "UDP|TCP", false));
     }
 }
