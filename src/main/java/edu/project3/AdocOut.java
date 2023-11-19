@@ -4,7 +4,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 
-public class AdocOut {
+public final class AdocOut {
+    private static final String BYTES_FORMAT = "bytes%n%n";
+    private static final String INT_FORMAT = "%d";
+
     private AdocOut() {}
 
     public static void writeStatistics(LogReport logReport, String filePath) {
@@ -12,7 +15,7 @@ public class AdocOut {
             writer.write("= Log Report Statistics\n\n");
 
             writer.write("== Total Requests\n\n");
-            writer.write(String.format("%d%n%n", logReport.getTotalRequests()));
+            writer.write(String.format(INT_FORMAT + "%n%n", logReport.getTotalRequests()));
 
             writer.write("== Resource Frequency\n\n");
             writeMap(logReport.getResourceFrequency(), writer);
@@ -24,13 +27,13 @@ public class AdocOut {
             writeMap(logReport.getProtocolFrequency(), writer);
 
             writer.write("== Average Response Size\n\n");
-            writer.write(String.format("%.2f bytes%n%n", logReport.getAverageResponseSize()));
+            writer.write(String.format("%.2f " + BYTES_FORMAT, logReport.getAverageResponseSize()));
 
             writer.write("== Maximum Response Size\n\n");
-            writer.write(String.format("%d bytes%n%n", logReport.getMaximumResponseSize()));
+            writer.write(String.format(INT_FORMAT + " " + BYTES_FORMAT, logReport.getMaximumResponseSize()));
 
             writer.write("== Minimum Response Size\n\n");
-            writer.write(String.format("%d bytes%n%n", logReport.getMinimumResponseSize()));
+            writer.write(String.format(INT_FORMAT + " " + BYTES_FORMAT, logReport.getMinimumResponseSize()));
 
             writer.flush();
         } catch (IOException ignored) {
@@ -40,7 +43,7 @@ public class AdocOut {
 
     private static <K> void writeMap(Map<K, Integer> map, FileWriter writer) throws IOException {
         for (Map.Entry<K, Integer> entry : map.entrySet()) {
-            writer.write(String.format("%s: %d%n", entry.getKey(), entry.getValue()));
+            writer.write(String.format("%s: " + INT_FORMAT + "%n", entry.getKey(), entry.getValue()));
         }
         writer.write("\n");
     }

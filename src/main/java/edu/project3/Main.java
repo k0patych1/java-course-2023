@@ -3,11 +3,18 @@ package edu.project3;
 import java.io.IOException;
 import java.util.List;
 
-public class Main {
+public final class Main {
     private Main() {}
 
     public static void main(String[] args) throws IOException {
-        String str = "--path /Users/ruslan/dev/java-course-2023/src/main/java/edu/project3/logs --from 17/May/2014:13:05:28 --format markdown";
+        String str = new StringBuilder()
+            .append("--path ")
+            .append("/Users/ruslan/dev/java-course-2023/src/main/java/edu/project3/logs")
+            .append(" --from ")
+            .append("17/May/2014:13:05:28")
+            .append(" --format")
+            .append(" markdown")
+            .toString();
         String[] args1 = str.split(" ");
 
         Configuration configuration = CommandLineParser.parseArguments(args1);
