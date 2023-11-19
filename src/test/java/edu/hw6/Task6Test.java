@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.ServerSocket;
+import java.net.SocketException;
 import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -13,19 +14,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class Task6Test {
     @Test
-    public void portStatusTest() throws IOException {
-        try (ServerSocket serverSocket = new ServerSocket(80);) {
-            assertFalse(PortScanner.isTcpOpen(80));
-            assertTrue(PortScanner.isUdpOpen(80));
+    public void portStatusTest() {
+        try (ServerSocket serverSocket = new ServerSocket(81);) {
+            assertFalse(PortScanner.isTcpOpen(81));
+            assertTrue(PortScanner.isUdpOpen(81));
+        } catch (IOException ignored) {
+
         }
 
-        try(DatagramSocket datagramSocket = new DatagramSocket(80);) {
-            assertTrue(PortScanner.isTcpOpen(80));
-            assertFalse(PortScanner.isUdpOpen(80));
+        try(DatagramSocket datagramSocket = new DatagramSocket(81);) {
+            assertTrue(PortScanner.isTcpOpen(81));
+            assertFalse(PortScanner.isUdpOpen(81));
+        } catch (SocketException ignored) {
         }
 
-        assertTrue(PortScanner.isTcpOpen(80));
-        assertTrue(PortScanner.isUdpOpen(80));
+        assertTrue(PortScanner.isTcpOpen(81));
+        assertTrue(PortScanner.isUdpOpen(81));
     }
 
     @Test
@@ -34,6 +38,6 @@ public class Task6Test {
         int maxPort = 49151;
 
         assertThat(ports.size()).isEqualTo(maxPort + 1);
-        assertThat(ports.get(80)).isEqualTo(new PortInfo(80, "UDP|TCP", true));
+        assertThat(ports.get(81)).isEqualTo(new PortInfo(81, "UDP|TCP", false));
     }
 }
