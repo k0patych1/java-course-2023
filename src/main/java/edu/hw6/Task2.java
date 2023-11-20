@@ -12,7 +12,7 @@ public final class Task2 {
 
     private Task2() {}
 
-    public static Path cloneFile(Path path) throws FileNotFoundException {
+    public static Path cloneFile(Path path) throws IOException {
         if (!path.toFile().exists()) {
             throw new FileNotFoundException("Couldn't find the file to copy");
         }
@@ -36,11 +36,7 @@ public final class Task2 {
             ++copyNumber;
         }
 
-        try {
-            Files.copy(path, newPath, StandardCopyOption.COPY_ATTRIBUTES);
-        } catch (IOException ignored) {
-
-        }
+        Files.copy(path, newPath, StandardCopyOption.COPY_ATTRIBUTES);
 
         return newPath;
     }

@@ -32,22 +32,20 @@ public class Task2Test {
     }
 
     @Test
-    public void singleCloneFileTest() throws FileNotFoundException {
+    public void singleCloneFileTest() throws IOException {
         assertTrue(Files.exists(cloningFile));
 
         var firstCopy = Task2.cloneFile(cloningFile);
         assertTrue(Files.exists(cloningFile.resolveSibling("Tinkoff Bank Biggest Secret — копия.txt")));
 
-        try {
-            byte[] fileContent = Files.readAllBytes(cloningFile);
-            byte[] copyFileContent = Files.readAllBytes(firstCopy);
+        byte[] fileContent = Files.readAllBytes(cloningFile);
+        byte[] copyFileContent = Files.readAllBytes(firstCopy);
 
-            assertArrayEquals(fileContent, copyFileContent);
-        } catch (IOException ignored) {}
+        assertArrayEquals(fileContent, copyFileContent);
     }
 
     @Test
-    public void severalClonesFileTest() throws FileNotFoundException {
+    public void severalClonesFileTest() throws IOException {
         Task2.cloneFile(cloningFile);
         assertTrue(Files.exists(cloningFile.resolveSibling("Tinkoff Bank Biggest Secret — копия.txt")));
         Task2.cloneFile(cloningFile);

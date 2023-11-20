@@ -14,18 +14,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class Task6Test {
     @Test
-    public void portStatusTest() {
+    public void portStatusTest() throws IOException {
         try (ServerSocket serverSocket = new ServerSocket(4000);) {
             assertFalse(PortScanner.isTcpOpen(4000));
             assertTrue(PortScanner.isUdpOpen(4000));
-        } catch (IOException ignored) {
-
         }
 
-        try(DatagramSocket datagramSocket = new DatagramSocket(4000);) {
+        try (DatagramSocket datagramSocket = new DatagramSocket(4000);) {
             assertTrue(PortScanner.isTcpOpen(4000));
             assertFalse(PortScanner.isUdpOpen(4000));
-        } catch (SocketException ignored) {
         }
 
         assertTrue(PortScanner.isTcpOpen(4000));

@@ -35,11 +35,14 @@ public final class PortScanner {
     public static List<PortInfo> checkAllPorts() {
         List<PortInfo> ports = new ArrayList<>();
         for (int port = 0; port <= MAX_PORT; ++port) {
-            if (isTcpOpen(port) && isUdpOpen(port)) {
+            boolean isTcpOpen = isTcpOpen(port);
+            boolean isUdpOpen = isUdpOpen(port);
+
+            if (isTcpOpen && isUdpOpen) {
                 ports.add(new PortInfo(port, UDP + '|' + TCP, false));
-            } else if (isUdpOpen(port)) {
+            } else if (isUdpOpen) {
                 ports.add(new PortInfo(port, UDP, false));
-            } else if (isTcpOpen(port)) {
+            } else if (isTcpOpen) {
                 ports.add(new PortInfo(port, TCP, false));
             } else {
                 ports.add(new PortInfo(port, UDP + '|' + TCP, true));

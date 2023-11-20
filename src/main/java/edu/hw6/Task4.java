@@ -17,17 +17,13 @@ public final class Task4 {
 
     private static final String TEXT = "Programming is learned by writing programs. ― Brian Kernighan";
 
-    public static void compositeWrite(Path path) {
-        try {
-            try (OutputStream outputStream = Files.newOutputStream(path, CREATE_NEW);
-                 CheckedOutputStream checkedOutputStream = new CheckedOutputStream(outputStream, new Adler32());
-                 BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(checkedOutputStream);
-                 OutputStreamWriter writer = new OutputStreamWriter(bufferedOutputStream, StandardCharsets.UTF_8);
-                 PrintWriter printWriter = new PrintWriter(writer)) {
-               printWriter.print(TEXT);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    public static void compositeWrite(Path path) throws IOException {
+        try (OutputStream outputStream = Files.newOutputStream(path, CREATE_NEW);
+             CheckedOutputStream checkedOutputStream = new CheckedOutputStream(outputStream, new Adler32());
+             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(checkedOutputStream);
+             OutputStreamWriter writer = new OutputStreamWriter(bufferedOutputStream, StandardCharsets.UTF_8);
+             PrintWriter printWriter = new PrintWriter(writer)) {
+            printWriter.print(TEXT);
         }
     }
 }

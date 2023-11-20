@@ -2,9 +2,8 @@ package edu.hw6.task1;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,8 +21,8 @@ public class DiskMap implements Map<String, String> {
         loadMapFromFile();
     }
 
-    private void loadMapFromFile() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(file.toFile()))) {
+    private void loadMapFromFile() throws DiskMapException {
+        try (BufferedReader reader = Files.newBufferedReader(file)) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(":", 2);
@@ -31,13 +30,13 @@ public class DiskMap implements Map<String, String> {
                 String value = parts[1];
                 map.put(key, value);
             }
-        } catch (IOException ignored) {
-
+        } catch (IOException e) {
+            throw new DiskMapException("Can't load a map from this file : " + e.getMessage());
         }
     }
 
-    private void saveMapToFile() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file.toFile()))) {
+    private void saveMapToFile() throws DiskMapException {
+        try (BufferedWriter writer = Files.newBufferedWriter(file)) {
             for (Map.Entry<String, String> entry : map.entrySet()) {
                 String key = entry.getKey();
                 String value = entry.getValue();
@@ -45,7 +44,8 @@ public class DiskMap implements Map<String, String> {
                 writer.write(line);
                 writer.newLine();
             }
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+            throw new DiskMapException("Can't save a map to this file : " + e.getMessage());
         }
     }
 

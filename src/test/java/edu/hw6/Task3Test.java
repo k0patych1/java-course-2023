@@ -38,8 +38,6 @@ public class Task3Test {
             raf1.setLength(10);
             raf2.setLength(100);
             raf3.setLength(1000);
-        } catch (IOException ignored) {
-
         }
 
         AbstractFilter filter = readable()
@@ -112,7 +110,7 @@ public class Task3Test {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file2.toFile()))) {
             writer.write("Hello, world!");
-        } catch (IOException ignored) {}
+        }
 
         AbstractFilter filter = regular()
             .and(magicNumber((byte) 72))
