@@ -1,6 +1,11 @@
 package edu.project3;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -10,16 +15,50 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class AnalyzeLogTest {
     @Test
-    public void getLogsTest() {
-        String str = "--path /Users/ruslan/dev/java-course-2023/src/main/java/edu/project3/logs --from 17/May/2014:13:05:28 --format markdown";
+    public void getLogsTest(@TempDir Path tempDir) throws IOException {
+        Path file = Files.createFile(tempDir.resolve("logs"));
+        String str = "--path " + file + " --from 17/May/2014:13:05:28 --format markdown";
         String[] args = str.split(" ");
+
+        try (BufferedWriter br = Files.newBufferedWriter(file)) {
+            String log1 = new StringBuilder()
+                .append("93.180.71.3")
+                .append(" - - [17/May/2015:08:05:32 +0000]")
+                .append(" \"GET /downloads/product_1 HTTP/1.1\"")
+                .append(" 304 1 \"-\" \"Debian APT-HTTP/1.3")
+                .append(" (0.8.16~exp12ubuntu10.21)\"")
+                .toString();
+
+            String log2 = new StringBuilder()
+                .append("93.180.71.3")
+                .append(" - - [17/May/2015:08:05:23 +0000]")
+                .append(" \"GET /downloads/product_1 HTTP/1.1\"")
+                .append(" 304 2 \"-\" \"Debian APT-HTTP/1.3")
+                .append(" (0.8.16~exp12ubuntu10.21)\"")
+                .toString();
+
+            String log3 = new StringBuilder()
+                .append("80.91.33.133")
+                .append(" - - [17/May/2015:08:05:24 +0000]")
+                .append(" \"GET /downloads/product_1 HTTP/1.1\"")
+                .append(" 304 3 \"-\" \"Debian APT-HTTP/1.3")
+                .append(" (0.8.16~exp12ubuntu10.17)\"")
+                .toString();
+
+            br.write(log1);
+            br.newLine();
+            br.write(log2);
+            br.newLine();
+            br.write(log3);
+            br.newLine();
+        }
 
         Configuration configuration = CommandLineParser.parseArguments(args);
 
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss",
             Locale.ENGLISH);
 
-        assertThat(configuration.getLogFilePath()).isEqualTo("/Users/ruslan/dev/java-course-2023/src/main/java/edu/project3/logs");
+        assertThat(configuration.getLogFilePath()).isEqualTo(file.toString());
         assertNull(configuration.getLogFilePathURL());
         assertThat(configuration.getFromDate())
             .isEqualTo(LocalDateTime.parse("17/May/2014:13:05:28", dateTimeFormatter));
@@ -32,9 +71,22 @@ public class AnalyzeLogTest {
 
         assertThat(logs.size()).isEqualTo(3);
 
-        LogRecord expected0 = new LogRecord("93.180.71.3", LocalDateTime.parse("2015-05-17T08:05:32"), "GET", "/downloads/product_1", "HTTP/1.1", 304, 1);
-        LogRecord expected1 = new LogRecord("93.180.71.3", LocalDateTime.parse("2015-05-17T08:05:23"), "GET", "/downloads/product_1", "HTTP/1.1", 304, 2);
-        LogRecord expected2 = new LogRecord("80.91.33.133", LocalDateTime.parse("2015-05-17T08:05:24"), "GET", "/downloads/product_1", "HTTP/1.1", 304, 3);
+        LogRecord expected0 = new LogRecord(
+            "93.180.71.3",
+            LocalDateTime.parse("2015-05-17T08:05:32"),
+            "GET", "/downloads/product_1",
+            "HTTP/1.1", 304, 1);
+
+        LogRecord expected1 = new LogRecord("93.180.71.3",
+            LocalDateTime.parse("2015-05-17T08:05:23"),
+            "GET", "/downloads/product_1",
+            "HTTP/1.1", 304, 2);
+
+        LogRecord expected2 = new LogRecord(
+            "80.91.33.133",
+            LocalDateTime.parse("2015-05-17T08:05:24"),
+            "GET", "/downloads/product_1",
+            "HTTP/1.1", 304, 3);
 
         assertThat(logs.get(0)).isEqualTo(expected0);
         assertThat(logs.get(1)).isEqualTo(expected1);
