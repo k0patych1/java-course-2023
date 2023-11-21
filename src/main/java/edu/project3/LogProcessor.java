@@ -1,10 +1,11 @@
 package edu.project3;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -16,64 +17,53 @@ public class LogProcessor {
         Locale.ENGLISH);
     public static final int SHIFT_TO_DATE_PARSE = 6;
 
-    private Configuration configuration;
+    private final Configuration configuration;
 
     public LogProcessor(Configuration configuration) {
         this.configuration = configuration;
     }
 
-    public List<LogRecord> parseLogs() {
+    public List<LogRecord> parseLogs() throws IOException {
         List<LogRecord> logs = new ArrayList<>();
         String logFilePath = configuration.getLogFilePath();
         LocalDateTime fromDate = configuration.getFromDate();
         LocalDateTime toDate = configuration.getToDate();
+        String urlLogs = configuration.getLogFilePathURL();
 
-        try (BufferedReader brUrl = new BufferedReader(
-            new InputStreamReader((new URL(configuration.getLogFilePathURL())).openStream()))) {
-            logs = parseLogsFromBuffer(brUrl, fromDate, toDate);
-        } catch (IOException ignored) {
-
+        if (urlLogs != null) {
+            try (BufferedReader brUrl = new BufferedReader(
+                new InputStreamReader((new URL(urlLogs)).openStream()))) {
+                logs = parseLogsFromBuffer(brUrl, fromDate, toDate);
+            }
         }
 
-        try (BufferedReader brFile = new BufferedReader(new FileReader(logFilePath))) {
-            logs.addAll(parseLogsFromBuffer(brFile, fromDate, toDate));
-        } catch (IOException ignored) {
+        if (logFilePath != null) {
+            List<Path> logFilePathes = getLogFiles(logFilePath);
 
+            for (Path logFile : logFilePathes) {
+                try (BufferedReader brFile = Files.newBufferedReader(logFile)) {
+                    logs.addAll(parseLogsFromBuffer(brFile, fromDate, toDate));
+                }
+            }
         }
 
         return logs;
     }
 
-    private List<LogRecord> parseLogsFromBuffer(BufferedReader br, LocalDateTime fromDate, LocalDateTime toDate) {
+    private List<LogRecord> parseLogsFromBuffer(BufferedReader br, LocalDateTime fromDate, LocalDateTime toDate)
+        throws IOException {
         List<LogRecord> logs = new ArrayList<>();
 
-        try {
-            String line;
+        String line;
 
-            while ((line = br.readLine()) != null) {
-                LocalDateTime logEntryTime = parseTime(line);
+        while ((line = br.readLine()) != null) {
+            LocalDateTime logEntryTime = parseTime(line);
 
-                boolean inTime = true;
-
-                if (fromDate != null) {
-                    if (!logEntryTime.isAfter(fromDate)) {
-                        inTime = false;
-                    }
-                }
-
-                if (toDate != null) {
-                    if (!logEntryTime.isBefore(toDate)) {
-                        inTime = false;
-                    }
-                }
-
-                if (inTime) {
-                    LogRecord logRecord = parseLog(line);
-                    logs.add(logRecord);
-                }
+            if (!(fromDate != null && !logEntryTime.isAfter(fromDate))
+                || (toDate != null && !logEntryTime.isBefore(toDate))) {
+                LogRecord logRecord = parseLog(line);
+                logs.add(logRecord);
             }
-
-        } catch (IOException ignored) {
         }
 
         return logs;
@@ -102,5 +92,25 @@ public class LogProcessor {
         int responseSize = Integer.parseInt(parts[9]);
 
         return new LogRecord(ipAddress, timestamp, method, url, protocol, statusCode, responseSize);
+    }
+
+    private List<Path> getLogFiles(String path) throws IOException {
+        int firstAsteriskIndex = path.indexOf("*");
+
+        if (firstAsteriskIndex == -1) {
+            ArrayList<Path> files = new ArrayList<>();
+            files.add(Path.of(path));
+
+            return files;
+        }
+
+        int lastSlashIndex = path.lastIndexOf("/", firstAsteriskIndex);
+
+        String startDir = path.substring(0, lastSlashIndex);
+
+        var docFileVisitor = new GlobFileVisitor(path);
+        Files.walkFileTree(Path.of(startDir), docFileVisitor);
+
+        return docFileVisitor.getMatchedFiles();
     }
 }

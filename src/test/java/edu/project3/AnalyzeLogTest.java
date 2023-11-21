@@ -12,14 +12,10 @@ import java.util.List;
 import java.util.Locale;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AnalyzeLogTest {
-    @Test
-    public void getLogsTest(@TempDir Path tempDir) throws IOException {
-        Path file = Files.createFile(tempDir.resolve("logs"));
-        String str = "--path " + file + " --from 17/May/2014:13:05:28 --format markdown";
-        String[] args = str.split(" ");
-
+    public void writeLogsToFile(Path file) throws IOException {
         try (BufferedWriter br = Files.newBufferedWriter(file)) {
             String log1 = new StringBuilder()
                 .append("93.180.71.3")
@@ -52,6 +48,15 @@ public class AnalyzeLogTest {
             br.write(log3);
             br.newLine();
         }
+    }
+
+    @Test
+    public void getLogsTest(@TempDir Path tempDir) throws IOException {
+        Path file = Files.createFile(tempDir.resolve("logs"));
+        String str = "--path " + file + " --from 17/May/2014:13:05:28 --format markdown";
+        String[] args = str.split(" ");
+
+        writeLogsToFile(file);
 
         Configuration configuration = CommandLineParser.parseArguments(args);
 
@@ -94,9 +99,12 @@ public class AnalyzeLogTest {
     }
 
     @Test
-    public void analyzeStatisticsTest() {
-        String str = "--path /Users/ruslan/dev/java-course-2023/src/main/java/edu/project3/logs --from 17/May/2014:13:05:28 --format markdown";
+    public void analyzeStatisticsTest(@TempDir Path tempDir) throws IOException {
+        Path file = Files.createFile(tempDir.resolve("logs"));
+        String str = "--path " + file + " --from 17/May/2014:13:05:28 --format markdown";
         String[] args = str.split(" ");
+
+        writeLogsToFile(file);
 
         Configuration configuration = CommandLineParser.parseArguments(args);
 
@@ -117,5 +125,39 @@ public class AnalyzeLogTest {
         assertThat(logReport.getResourceFrequency().get("/downloads/product_1")).isEqualTo(3);
         assertThat(logReport.getResponseCodeFrequency().size()).isEqualTo(1);
         assertThat(logReport.getResponseCodeFrequency().get(304)).isEqualTo(3);
+    }
+
+    @Test
+
+    public void getLogsFromUrlTest() throws IOException {
+        String url =
+            "https://raw.githubusercontent.com/elastic/examples/master/Common%20Data%20Formats/nginx_logs/nginx_logs";
+        String str = "--path " + url + " --from 17/May/2014:13:05:28 --format markdown";
+        String[] args = str.split(" ");
+
+        Configuration configuration = CommandLineParser.parseArguments(args);
+
+        LogProcessor logProcessor = new LogProcessor(configuration);
+
+        List<LogRecord> logs = logProcessor.parseLogs();
+
+        LogReport logReport = new LogReport();
+        logReport.analyzeStatistics(logs);
+
+        assertTrue(logs.size() > 100);
+
+        LogRecord firstLog = logs.get(0);
+
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(
+            "dd/MMM/yyyy:HH:mm:ss",
+            Locale.ENGLISH
+        );
+
+        assertThat(firstLog.ipAddress()).isEqualTo("93.180.71.3");
+        assertThat(firstLog.timestamp()).isEqualTo((LocalDateTime.parse("17/May/2015:08:05:32", dateTimeFormatter)));
+        assertThat(firstLog.url()).isEqualTo("/downloads/product_1");
+        assertThat(firstLog.protocol()).isEqualTo("HTTP/1.1");
+        assertThat(firstLog.statusCode()).isEqualTo(304);
+        assertThat(firstLog.responseSize()).isEqualTo(0);
     }
 }
