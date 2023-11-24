@@ -40,7 +40,7 @@ public class MarkdownOut implements IOut {
         }
     }
 
-    private static<T> void writeMap(Map<T, Integer> map, FileWriter writer) throws IOException {
+    private static <T> void writeMap(Map<T, Integer> map, FileWriter writer) throws IOException {
         for (Map.Entry<T, Integer> entry : map.entrySet()) {
             writer.write(String.format("- %s: " + INT_FORMAT + "%n", entry.getKey(), entry.getValue()));
         }

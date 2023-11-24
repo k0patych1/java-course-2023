@@ -1,7 +1,6 @@
 package edu.project3.entities;
 
 import edu.project3.models.LogRecord;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;

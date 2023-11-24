@@ -7,7 +7,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GlobParser {
+public final class GlobParser {
     private GlobParser() {}
 
     public static List<Path> getFiles(String path) throws IOException {

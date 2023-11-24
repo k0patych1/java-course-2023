@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class LogsParser {
+public final class LogsParser {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(
         "dd/MMM/yyyy:HH:mm:ss",
         Locale.ENGLISH

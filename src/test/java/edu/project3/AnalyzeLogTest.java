@@ -8,19 +8,16 @@ import edu.project3.services.out.AdocOut;
 import edu.project3.services.out.MarkdownOut;
 import edu.project3.services.parsers.CommandLineParser;
 import edu.project3.services.parsers.GlobParser;
-import edu.project3.services.parsers.TimeParser;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -240,8 +237,7 @@ public class AnalyzeLogTest {
             "## Minimum Response Size\n" +
             "\n" +
             "1 bytes\n" +
-            "\n" +
-            "");
+            "\n");
 
         assertDoesNotThrow(() -> new AdocOut().writeStatistics(logReport, String.valueOf(fileToWrite)));
     }
