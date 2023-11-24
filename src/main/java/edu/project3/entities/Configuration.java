@@ -1,4 +1,4 @@
-package edu.project3;
+package edu.project3.entities;
 
 import java.time.LocalDateTime;
 

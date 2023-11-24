@@ -1,16 +1,28 @@
 package edu.project3;
 
+import edu.project3.entities.Configuration;
+import edu.project3.entities.LogReport;
+import edu.project3.models.LogRecord;
+import edu.project3.services.LogProcessor;
+import edu.project3.services.out.AdocOut;
+import edu.project3.services.out.MarkdownOut;
+import edu.project3.services.parsers.CommandLineParser;
+import edu.project3.services.parsers.GlobParser;
+import edu.project3.services.parsers.TimeParser;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -72,7 +84,7 @@ public class AnalyzeLogTest {
 
         LogProcessor logProcessor = new LogProcessor(configuration);
 
-        List<LogRecord> logs = logProcessor.parseLogs();
+        List<LogRecord> logs = logProcessor.getLogs();
 
         assertThat(logs.size()).isEqualTo(3);
 
@@ -110,7 +122,7 @@ public class AnalyzeLogTest {
 
         LogProcessor logProcessor = new LogProcessor(configuration);
 
-        List<LogRecord> logs = logProcessor.parseLogs();
+        List<LogRecord> logs = logProcessor.getLogs();
 
         LogReport logReport = new LogReport();
         logReport.analyzeStatistics(logs);
@@ -128,7 +140,6 @@ public class AnalyzeLogTest {
     }
 
     @Test
-
     public void getLogsFromUrlTest() throws IOException {
         String url =
             "https://raw.githubusercontent.com/elastic/examples/master/Common%20Data%20Formats/nginx_logs/nginx_logs";
@@ -139,7 +150,7 @@ public class AnalyzeLogTest {
 
         LogProcessor logProcessor = new LogProcessor(configuration);
 
-        List<LogRecord> logs = logProcessor.parseLogs();
+        List<LogRecord> logs = logProcessor.getLogs();
 
         LogReport logReport = new LogReport();
         logReport.analyzeStatistics(logs);
@@ -159,5 +170,79 @@ public class AnalyzeLogTest {
         assertThat(firstLog.protocol()).isEqualTo("HTTP/1.1");
         assertThat(firstLog.statusCode()).isEqualTo(304);
         assertThat(firstLog.responseSize()).isEqualTo(0);
+    }
+
+    @Test
+    public void globParserTest(@TempDir Path tempDir) throws IOException {
+        Path file1 = Files.createFile(tempDir.resolve("logs1.txt"));
+        Path file2 = Files.createFile(tempDir.resolve("logs2.txt"));
+        Path file3 = Files.createFile(tempDir.resolve("logs3.pages"));
+        Path file4 = Files.createFile(tempDir.resolve("laba.txt"));
+
+
+        List<Path> files = GlobParser.getFiles(tempDir.resolve("log*.txt").toString());
+
+        assertThat(files.size()).isEqualTo(2);
+        assertThat(files).contains(file1);
+        assertThat(files).contains(file2);
+    }
+
+    @Test
+    public void markdownOutTest(@TempDir Path tempDir) throws IOException {
+        Path fileToWrite = Files.createFile(tempDir.resolve("logStat.txt"));
+        var markdown = new MarkdownOut();
+
+        Path fileWithLogs = Files.createFile(tempDir.resolve("logs"));
+        String str = "--path " + fileWithLogs + " --from 17/May/2014:13:05:28 --format markdown";
+        String[] args = str.split(" ");
+
+        writeLogsToFile(fileWithLogs);
+
+        Configuration configuration = CommandLineParser.parseArguments(args);
+
+        LogProcessor logProcessor = new LogProcessor(configuration);
+
+        List<LogRecord> logs = logProcessor.getLogs();
+
+        LogReport logReport = new LogReport();
+        logReport.analyzeStatistics(logs);
+
+        markdown.writeStatistics(logReport, String.valueOf(fileToWrite));
+
+        String markdownString = Files.readString(fileToWrite);
+
+        assertThat(markdownString).isEqualTo("# Log Report Statistics\n" +
+            "\n" +
+            "## Total Requests\n" +
+            "\n" +
+            "3\n" +
+            "\n" +
+            "## Resource Frequency\n" +
+            "\n" +
+            "- /downloads/product_1: 3\n" +
+            "\n" +
+            "## Response Code Frequency\n" +
+            "\n" +
+            "- 304: 3\n" +
+            "\n" +
+            "## Protocol Frequency\n" +
+            "\n" +
+            "- HTTP/1.1: 3\n" +
+            "\n" +
+            "## Average Response Size\n" +
+            "\n" +
+            "2,00 bytes\n" +
+            "\n" +
+            "## Maximum Response Size\n" +
+            "\n" +
+            "3 bytes\n" +
+            "\n" +
+            "## Minimum Response Size\n" +
+            "\n" +
+            "1 bytes\n" +
+            "\n" +
+            "");
+
+        assertDoesNotThrow(() -> new AdocOut().writeStatistics(logReport, String.valueOf(fileToWrite)));
     }
 }

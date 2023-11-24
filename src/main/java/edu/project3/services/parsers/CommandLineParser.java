@@ -1,5 +1,6 @@
-package edu.project3;
+package edu.project3.services.parsers;
 
+import edu.project3.entities.Configuration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
