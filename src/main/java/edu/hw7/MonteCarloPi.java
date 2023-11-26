@@ -27,22 +27,23 @@ public final class MonteCarloPi {
 
     public static double calculatePiBySeveralThreads(long iterations) throws InterruptedException {
         AtomicLong circleCount = new AtomicLong(0);
-        AtomicLong totalCount = new AtomicLong(0);
-
         Thread[] threads = new Thread[NUM_THREADS];
+
         for (int i = 0; i < NUM_THREADS; ++i) {
             threads[i] = new Thread(() -> {
-                for (long j = 0; j < iterations; ++j) {
+                long circleCountInThisThread = 0;
+
+                for (long j = 0; j < iterations / NUM_THREADS; ++j) {
                     double x = ThreadLocalRandom.current().nextDouble();
                     double y = ThreadLocalRandom.current().nextDouble();
 
                     double distance = Math.hypot(x, y);
                     if (distance <= 1) {
-                        circleCount.incrementAndGet();
+                        ++circleCountInThisThread;
                     }
-
-                    totalCount.incrementAndGet();
                 }
+
+                circleCount.addAndGet(circleCountInThisThread);
             });
 
             threads[i].start();
@@ -52,6 +53,6 @@ public final class MonteCarloPi {
             thread.join();
         }
 
-        return MONTE_CARLO_NUMBER * circleCount.get() / totalCount.get();
+        return MONTE_CARLO_NUMBER * circleCount.get() / iterations;
     }
 }
