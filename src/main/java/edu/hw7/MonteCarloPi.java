@@ -4,7 +4,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicLong;
 
 public final class MonteCarloPi {
-
     private static final int NUM_THREADS = 10; //m1 pro num of cores
 
     private MonteCarloPi() {}
