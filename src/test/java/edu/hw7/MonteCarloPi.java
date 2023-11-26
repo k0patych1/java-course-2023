@@ -1,5 +1,6 @@
 package edu.hw7;
 
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicLong;
 
 public final class MonteCarloPi {
@@ -32,8 +33,8 @@ public final class MonteCarloPi {
         for (int i = 0; i < NUM_THREADS; ++i) {
             threads[i] = new Thread(() -> {
                 for (long j = 0; j < iterations; ++j) {
-                    double x = Math.random();
-                    double y = Math.random();
+                    double x = ThreadLocalRandom.current().nextDouble();
+                    double y = ThreadLocalRandom.current().nextDouble();
 
                     double distance = Math.hypot(x, y);
                     if (distance <= 1) {
@@ -51,6 +52,6 @@ public final class MonteCarloPi {
             thread.join();
         }
 
-        return  4.0 * circleCount.get() / totalCount.get();
+        return 4.0 * circleCount.get() / totalCount.get();
     }
 }
