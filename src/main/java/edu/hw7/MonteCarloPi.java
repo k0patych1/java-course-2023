@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public final class MonteCarloPi {
     private static final int NUM_THREADS = 10; //m1 pro num of cores
+    private static final double MONTE_CARLO_NUMBER = 4.0;
 
     private MonteCarloPi() {}
 
@@ -21,7 +22,7 @@ public final class MonteCarloPi {
             }
         }
 
-        return 4.0 * (circleCount / (double) iterations);
+        return MONTE_CARLO_NUMBER * (circleCount / (double) iterations);
     }
 
     public static double calculatePiBySeveralThreads(long iterations) throws InterruptedException {
@@ -51,6 +52,6 @@ public final class MonteCarloPi {
             thread.join();
         }
 
-        return 4.0 * circleCount.get() / totalCount.get();
+        return MONTE_CARLO_NUMBER * circleCount.get() / totalCount.get();
     }
 }
