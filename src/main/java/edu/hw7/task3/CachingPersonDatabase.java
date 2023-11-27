@@ -23,6 +23,10 @@ public class CachingPersonDatabase implements PersonDatabase {
 
     @Override
     public synchronized void add(Person person) {
+        if (cache.containsKey(person.id())) {
+            throw new DuplicateIdException("Unique value id isn't unique : " + person.id());
+        }
+
         cache.put(person.id(), person);
         addToIndex(person.name(), nameIndex, person.id());
         addToIndex(person.address(), addressIndex, person.id());

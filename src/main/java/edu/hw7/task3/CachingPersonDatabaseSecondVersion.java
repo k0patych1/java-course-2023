@@ -1,5 +1,6 @@
 package edu.hw7.task3;
 
+import javax.naming.directory.InvalidAttributeIdentifierException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,6 +27,10 @@ public class CachingPersonDatabaseSecondVersion implements PersonDatabase {
     public void add(Person person) {
         lock.writeLock().lock();
         try {
+            if (cache.containsKey(person.id())) {
+                throw new DuplicateIdException("Unique value id isn't unique : " + person.id());
+            }
+
             cache.put(person.id(), person);
             addToIndex(person.name(), nameIndex, person.id());
             addToIndex(person.address(), addressIndex, person.id());

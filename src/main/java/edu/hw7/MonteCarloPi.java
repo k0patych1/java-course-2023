@@ -1,6 +1,9 @@
 package edu.hw7;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 public final class MonteCarloPi {
@@ -27,30 +30,26 @@ public final class MonteCarloPi {
 
     public static double calculatePiBySeveralThreads(long iterations) throws InterruptedException {
         AtomicLong circleCount = new AtomicLong(0);
-        Thread[] threads = new Thread[NUM_THREADS];
+        try (ExecutorService executor = Executors.newFixedThreadPool(NUM_THREADS)) {
+            for (int i = 0; i < NUM_THREADS; ++i) {
+                executor.submit(() -> {
+                    long circleCountInThisThread = 0;
 
-        for (int i = 0; i < NUM_THREADS; ++i) {
-            threads[i] = new Thread(() -> {
-                long circleCountInThisThread = 0;
+                    for (long j = 0; j < iterations / NUM_THREADS; ++j) {
+                        double x = ThreadLocalRandom.current().nextDouble();
+                        double y = ThreadLocalRandom.current().nextDouble();
 
-                for (long j = 0; j < iterations / NUM_THREADS; ++j) {
-                    double x = ThreadLocalRandom.current().nextDouble();
-                    double y = ThreadLocalRandom.current().nextDouble();
-
-                    double distance = Math.hypot(x, y);
-                    if (distance <= 1) {
-                        ++circleCountInThisThread;
+                        double distance = Math.hypot(x, y);
+                        if (distance <= 1) {
+                            ++circleCountInThisThread;
+                        }
                     }
-                }
 
-                circleCount.addAndGet(circleCountInThisThread);
-            });
+                    circleCount.addAndGet(circleCountInThisThread);
+                });
+            }
 
-            threads[i].start();
-        }
-
-        for (Thread thread : threads) {
-            thread.join();
+            executor.shutdown();
         }
 
         return MONTE_CARLO_NUMBER * circleCount.get() / iterations;
