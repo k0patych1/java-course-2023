@@ -1,6 +1,5 @@
 package edu.hw7.task3;
 
-import javax.naming.directory.InvalidAttributeIdentifierException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
