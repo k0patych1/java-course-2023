@@ -9,7 +9,10 @@ import edu.project2.services.solvers.RecursiveBacktrackerSolver;
 import edu.project2.services.solvers.Solver;
 import java.util.Scanner;
 
-public class Main {
+public final class Main {
+    private Main() {}
+
+    @SuppressWarnings("RegexpSinglelineJava")
     public static void main(String[] args) {
         System.out.println("Enter the height and width of the maze!");
 
@@ -45,8 +48,7 @@ public class Main {
 
         if (scanner.hasNext()) {
             startY = scanner.nextInt();
-        }
-        else {
+        } else {
             throw new IllegalArgumentException("Invalid start y coordinate provided");
         }
 
@@ -63,8 +65,7 @@ public class Main {
 
         if (scanner.hasNext()) {
             endY = scanner.nextInt();
-        }
-        else {
+        } else {
             throw new IllegalArgumentException("Invalid end y coordinate provided");
         }
 
