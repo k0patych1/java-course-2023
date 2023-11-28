@@ -1,4 +1,4 @@
-package edu.project2;
+package edu.project2.models;
 
 public class Cell {
     private int row;
@@ -21,18 +21,6 @@ public class Cell {
 
     public Type getType() {
         return type;
-    }
-
-    public Coordinate getCoordinate() {
-        return new Coordinate(row, col);
-    }
-
-    public void setRow(int row) {
-        this.row = row;
-    }
-
-    public void setCol(int col) {
-        this.col = col;
     }
 
     public void setType(Type type) {

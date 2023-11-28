@@ -1,8 +1,18 @@
 package edu.project2;
 
-import org.junit.jupiter.api.Test;
+import edu.project2.entities.Maze;
+import edu.project2.models.Cell;
+import edu.project2.models.Coordinate;
+import edu.project2.services.generators.Generator;
+import edu.project2.services.generators.RecursiveBacktrackerGenerator;
+import edu.project2.services.renders.MazeRenderer;
+import edu.project2.services.renders.Renderer;
+import edu.project2.services.solvers.RecursiveBacktrackerSolver;
+import edu.project2.services.solvers.Solver;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -87,16 +97,48 @@ public class MazeTests {
             solver.solve(getMaze(),
                 new Coordinate(1, 1), new Coordinate(8, 11)));
 
-        String expectedOutput = "█████████████\n" +
-            "█•█ █ █•••••█\n" +
-            "█•█   █•███•█\n" +
-            "█•  ███•   •█\n" +
-            "█•█•••••███•█\n" +
-            "█•█•███ █  •█\n" +
-            "█•█•█   ███•█\n" +
-            "█•█•███ █ █•█\n" +
-            "█•••      █•█\n" +
-            "█████████████\n";
+
+        String expectedOutput = new StringBuilder()
+            .append("🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵\n")
+            .append("🌵🚶🌵⬛🌵⬛🌵🚶🚶🚶🚶🚶🌵\n")
+            .append("🌵🚶🌵⬛⬛⬛🌵🚶🌵🌵🌵🚶🌵\n")
+            .append("🌵🚶⬛⬛🌵🌵🌵🚶⬛⬛⬛🚶🌵\n")
+            .append("🌵🚶🌵🚶🚶🚶🚶🚶🌵🌵🌵🚶🌵\n")
+            .append("🌵🚶🌵🚶🌵🌵🌵⬛🌵⬛⬛🚶🌵\n")
+            .append("🌵🚶🌵🚶🌵⬛⬛⬛🌵🌵🌵🚶🌵\n")
+            .append("🌵🚶🌵🚶🌵🌵🌵⬛🌵⬛🌵🚶🌵\n")
+            .append("🌵🚶🚶🚶⬛⬛⬛⬛⬛⬛🌵🚶🌵\n")
+            .append("🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵\n")
+            .toString();
+
+        assertThat(output).isEqualTo(expectedOutput);
+    }
+
+    public class MyRandom extends Random {
+        @Override
+        public int nextInt(int bound) {
+            return bound - 1;
+        }
+    }
+
+    @Test
+    public void generateMazeTest() {
+        Generator mazeGenerator = new RecursiveBacktrackerGenerator(new MyRandom());
+        Maze maze = mazeGenerator.generate(4, 20);
+
+        Solver solver = new RecursiveBacktrackerSolver();
+        var path = solver.solve(maze, new Coordinate(1, 1), new Coordinate(3, 19));
+
+        Renderer mazeRenderer = new MazeRenderer();
+        String output = mazeRenderer.render(maze, path);
+
+        String expectedOutput = new StringBuilder()
+            .append("🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵\n")
+            .append("🌵🚶🚶🚶🌵🚶🚶🚶🌵🚶🚶🚶🌵🚶🚶🚶🌵🚶🚶🚶🌵\n")
+            .append("🌵⬛🌵🚶🌵🚶🌵🚶🌵🚶🌵🚶🌵🚶🌵🚶🌵🚶🌵🚶🌵\n")
+            .append("🌵⬛🌵🚶🚶🚶🌵🚶🚶🚶🌵🚶🚶🚶🌵🚶🚶🚶🌵🚶🌵\n")
+            .append("🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵🌵\n")
+            .toString();
 
         assertThat(output).isEqualTo(expectedOutput);
     }

@@ -1,11 +1,26 @@
-package edu.project2;
+package edu.project2.services.renders;
 
+import edu.project2.entities.Maze;
+import edu.project2.models.Cell;
+import edu.project2.models.Coordinate;
 import java.util.List;
 
 public class MazeRenderer implements Renderer {
-    private static final String WALL_SYMBOL = "█";
-    private static final String PASSAGE_SYMBOL = " ";
-    private static final String PATH_SYMBOL = "•";
+    private final String wallSymbol;
+    private final String passageSymbol;
+    private final String pathSymbol;
+
+    public MazeRenderer() {
+        wallSymbol = "🌵";
+        passageSymbol = "⬛";
+        pathSymbol = "🚶";
+    }
+
+    public MazeRenderer(String wallSymbol, String passageSymbol, String pathSymbol) {
+        this.wallSymbol = wallSymbol;
+        this.passageSymbol = passageSymbol;
+        this.pathSymbol = pathSymbol;
+    }
 
     @Override
     public String render(Maze maze) {
@@ -14,7 +29,7 @@ public class MazeRenderer implements Renderer {
         for (int row = 0; row < maze.getHeight() + 1; ++row) {
             for (int col = 0; col < maze.getWidth() + 1; ++col) {
                 Cell cell = maze.getCell(new Coordinate(row, col));
-                String symbol = cell.getType() == Cell.Type.WALL ? WALL_SYMBOL : PASSAGE_SYMBOL;
+                String symbol = cell.getType() == Cell.Type.WALL ? wallSymbol : passageSymbol;
                 sb.append(symbol);
             }
             sb.append("\n");
@@ -31,10 +46,10 @@ public class MazeRenderer implements Renderer {
             for (int col = 0; col < maze.getWidth() + 1; ++col) {
                 Coordinate currentCoordinate = new Coordinate(row, col);
                 if (path.contains(currentCoordinate)) {
-                    sb.append(PATH_SYMBOL);
+                    sb.append(pathSymbol);
                 } else {
                     Cell cell = maze.getCell(currentCoordinate);
-                    String symbol = cell.getType() == Cell.Type.WALL ? WALL_SYMBOL : PASSAGE_SYMBOL;
+                    String symbol = cell.getType() == Cell.Type.WALL ? wallSymbol : passageSymbol;
                     sb.append(symbol);
                 }
             }

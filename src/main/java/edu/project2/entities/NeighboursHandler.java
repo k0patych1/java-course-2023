@@ -1,5 +1,7 @@
-package edu.project2;
+package edu.project2.entities;
 
+import edu.project2.models.Cell;
+import edu.project2.models.Coordinate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -41,7 +43,10 @@ public class NeighboursHandler {
     private boolean isValidCoordinate(Coordinate coordinate, Maze maze) {
         int row = coordinate.row();
         int col = coordinate.col();
-        return row >= 0 && row < maze.getHeight() && col >= 0 && col < maze.getWidth();
+        return row >= 0
+            && row < maze.getHeight()
+            && col >= 0
+            && col < maze.getWidth();
     }
 
     public void removeWallBetweenNeighbours(Maze maze, Cell cell1, Cell cell2) {
@@ -51,7 +56,7 @@ public class NeighboursHandler {
         int addX = (xDiff != 0) ? (xDiff / Math.abs(xDiff)) : 0;
         int addY = (yDiff != 0) ? (yDiff / Math.abs(yDiff)) : 0;
 
-        Coordinate wallCoordinate = new Coordinate(cell1.getCol() + addY, cell1.getRow() + addX);
+        Coordinate wallCoordinate = new Coordinate(cell1.getRow() + addX, cell1.getCol() + addY);
 
         maze.setCell(wallCoordinate, Cell.Type.PASSAGE);
     }

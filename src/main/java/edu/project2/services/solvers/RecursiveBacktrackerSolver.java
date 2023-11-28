@@ -1,5 +1,9 @@
-package edu.project2;
+package edu.project2.services.solvers;
 
+import edu.project2.entities.Maze;
+import edu.project2.entities.NeighboursHandler;
+import edu.project2.models.Cell;
+import edu.project2.models.Coordinate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,31 +27,36 @@ public class RecursiveBacktrackerSolver implements Solver {
         Stack<Cell> stack = new Stack<>();
         Set<Cell> visited = new HashSet<>();
         Cell currentCell = maze.getCell(start);
-        stack.add(currentCell);
         Map<Cell, Cell> parents = new HashMap<>();
+
+        stack.add(currentCell);
 
         while (!stack.isEmpty()) {
             currentCell = stack.pop();
 
-            if (!visited.contains(currentCell)) {
-                visited.add(currentCell);
+            if (visited.contains(currentCell)) {
+                continue;
+            }
 
-                if (currentCell.getCol() == end.col() && currentCell.getRow() == end.row()) {
-                    while (currentCell != null) {
-                        path.add(new Coordinate(currentCell.getRow(), currentCell.getCol()));
-                        currentCell = parents.get(currentCell);
-                    }
+            visited.add(currentCell);
 
-                    return path;
+            if (currentCell.getCol() == end.col() && currentCell.getRow() == end.row()) {
+                while (currentCell != null) {
+                    path.add(new Coordinate(currentCell.getRow(), currentCell.getCol()));
+                    currentCell = parents.get(currentCell);
                 }
 
-                List<Cell> neighbours = neighboursHandler.getNeighboursInDistance(currentCell, maze, 1);
-                for (Cell neighbour : neighbours) {
-                    if (!visited.contains(neighbour) && !(neighbour.getType() == Cell.Type.WALL)) {
-                        parents.put(neighbour, currentCell);
-                        stack.push(neighbour);
-                    }
+                return path;
+            }
+
+            List<Cell> neighbours = neighboursHandler.getNeighboursInDistance(currentCell, maze, 1);
+            for (Cell neighbour : neighbours) {
+                if (visited.contains(neighbour) || neighbour.getType() == Cell.Type.WALL) {
+                    continue;
                 }
+
+                parents.put(neighbour, currentCell);
+                stack.push(neighbour);
             }
         }
 

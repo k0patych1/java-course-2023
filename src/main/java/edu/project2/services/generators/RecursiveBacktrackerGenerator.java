@@ -1,5 +1,8 @@
-package edu.project2;
+package edu.project2.services.generators;
 
+import edu.project2.entities.Maze;
+import edu.project2.entities.NeighboursHandler;
+import edu.project2.models.Cell;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -17,7 +20,7 @@ public class RecursiveBacktrackerGenerator implements Generator {
         neighboursHandler = new NeighboursHandler();
     }
 
-    public RecursiveBacktrackerGenerator(Coordinate startCoordinate, Random random) {
+    public RecursiveBacktrackerGenerator(Random random) {
         neighboursHandler = new NeighboursHandler(random);
     }
 
