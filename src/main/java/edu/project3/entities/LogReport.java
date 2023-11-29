@@ -23,11 +23,11 @@ public class LogReport {
     public void analyzeStatistics(Collection<LogRecord> logs) {
         totalRequests = logs.size();
 
-        logs.forEach(log -> {
-                resourceFrequency.merge(log.url(), 1, Integer::sum);
-                responseCodeFrequency.merge(log.statusCode(), 1, Integer::sum);
-                protocolFrequency.merge(log.protocol(), 1, Integer::sum);
-                totalResponseSize += log.responseSize();
+        for (LogRecord log : logs) {
+            resourceFrequency.merge(log.url(), 1, Integer::sum);
+            responseCodeFrequency.merge(log.statusCode(), 1, Integer::sum);
+            protocolFrequency.merge(log.protocol(), 1, Integer::sum);
+            totalResponseSize += log.responseSize();
 
             if (log.responseSize() > maximumResponseSize) {
                 maximumResponseSize = log.responseSize();
@@ -35,7 +35,7 @@ public class LogReport {
             if (log.responseSize() < minimumResponseSize) {
                 minimumResponseSize = log.responseSize();
             }
-            });
+        }
     }
 
     public int getTotalRequests() {

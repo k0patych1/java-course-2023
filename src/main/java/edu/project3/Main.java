@@ -24,13 +24,15 @@ public final class Main {
         LogReport logReport = new LogReport();
         logReport.analyzeStatistics(logs);
 
-        String fileToWrite = Path.of(System.getProperty("user. dir")).resolve("logstat").toString();
+        Path dirPath = Path.of(System.getProperty("user.dir"));
 
         String format = configuration.getOutputFormat();
 
         if (format == null || format.equals("markdown")) {
+            String fileToWrite = dirPath.resolve("logstat.md").toString();
             new MarkdownOut().writeStatistics(logReport, fileToWrite);
         } else {
+            String fileToWrite = dirPath.resolve("logstat.adoc").toString();
             new AdocOut().writeStatistics(logReport, fileToWrite);
         }
     }
