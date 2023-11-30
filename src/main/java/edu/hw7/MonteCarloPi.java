@@ -3,7 +3,7 @@ package edu.hw7;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.LongAdder;
 
 public final class MonteCarloPi {
     private static final int NUM_THREADS = 10; //m1 pro num of cores
@@ -28,13 +28,15 @@ public final class MonteCarloPi {
     }
 
     public static double calculatePiBySeveralThreads(long iterations) throws InterruptedException {
-        AtomicLong circleCount = new AtomicLong(0);
+        LongAdder circleCount = new LongAdder();
         try (ExecutorService executor = Executors.newFixedThreadPool(NUM_THREADS)) {
             for (int i = 0; i < NUM_THREADS; ++i) {
+                long iterationsPerThread = (i == NUM_THREADS - 1)
+                    ? iterations / NUM_THREADS + iterations % NUM_THREADS
+                    : iterations / NUM_THREADS;
                 executor.submit(() -> {
                     long circleCountInThisThread = 0;
-
-                    for (long j = 0; j < iterations / NUM_THREADS; ++j) {
+                    for (long j = 0; j < iterationsPerThread; ++j) {
                         double x = ThreadLocalRandom.current().nextDouble();
                         double y = ThreadLocalRandom.current().nextDouble();
 
@@ -44,13 +46,13 @@ public final class MonteCarloPi {
                         }
                     }
 
-                    circleCount.addAndGet(circleCountInThisThread);
+                    circleCount.add(circleCountInThisThread);
                 });
             }
 
             executor.shutdown();
         }
 
-        return MONTE_CARLO_NUMBER * circleCount.get() / iterations;
+        return MONTE_CARLO_NUMBER * circleCount.sum() / iterations;
     }
 }
