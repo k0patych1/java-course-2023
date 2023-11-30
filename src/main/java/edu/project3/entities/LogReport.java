@@ -1,12 +1,22 @@
 package edu.project3.entities;
 
 import edu.project3.models.LogRecord;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class LogReport {
-    private int totalRequests;
+    private List<String> files;
+
+    private List<String> urls;
+
+    private LocalDateTime fromDate;
+
+    private LocalDateTime toDate;
+
+    private long totalRequests = 0;
 
     private final Map<String, Integer> resourceFrequency = new HashMap<>();
 
@@ -14,11 +24,18 @@ public class LogReport {
 
     private final Map<String, Integer> protocolFrequency = new HashMap<>();
 
-    private int totalResponseSize = 0;
+    private long totalResponseSize = 0;
 
-    private int maximumResponseSize = Integer.MIN_VALUE;
+    private long maximumResponseSize = Integer.MIN_VALUE;
 
-    private int minimumResponseSize = Integer.MAX_VALUE;
+    private long minimumResponseSize = Integer.MAX_VALUE;
+
+    public void processingConfiguration(Configuration configuration) {
+        this.files = configuration.getLogFilesPath();
+        this.urls = configuration.getLogFilesPathURL();
+        this.fromDate = configuration.getFromDate();
+        this.toDate = configuration.getToDate();
+    }
 
     public void analyzeStatistics(Collection<LogRecord> logs) {
         totalRequests = logs.size();
@@ -38,7 +55,7 @@ public class LogReport {
         }
     }
 
-    public int getTotalRequests() {
+    public long getTotalRequests() {
         return totalRequests;
     }
 
@@ -61,11 +78,27 @@ public class LogReport {
         return (double) totalResponseSize / totalRequests;
     }
 
-    public int getMaximumResponseSize() {
+    public long getMaximumResponseSize() {
         return maximumResponseSize;
     }
 
-    public int getMinimumResponseSize() {
+    public long getMinimumResponseSize() {
         return minimumResponseSize;
+    }
+
+    public LocalDateTime getFromDate() {
+        return fromDate;
+    }
+
+    public LocalDateTime getToDate() {
+        return toDate;
+    }
+
+    public List<String> getFiles() {
+        return files;
+    }
+
+    public List<String> getUrls() {
+        return urls;
     }
 }

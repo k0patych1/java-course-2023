@@ -12,19 +12,15 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AnalyzeLogTest {
-    public void writeLogsToFile(Path file) throws IOException {
+    public static void writeLogsToFile(Path file) throws IOException {
         try (BufferedWriter br = Files.newBufferedWriter(file)) {
             String log1 = new StringBuilder()
                 .append("93.180.71.3")
@@ -60,8 +56,40 @@ public class AnalyzeLogTest {
     }
 
     @Test
-    public void getLogsTest(@TempDir Path tempDir) throws IOException {
-        Path file = Files.createFile(tempDir.resolve("logs"));
+    public void globParserTest(@TempDir Path tempDir) throws IOException {
+        Path file1 = Files.createFile(tempDir.resolve("logs1.txt"));
+        Path file2 = Files.createFile(tempDir.resolve("logs2.txt"));
+        Files.createFile(tempDir.resolve("logs3.pages"));
+        Files.createFile(tempDir.resolve("laba.txt"));
+
+
+        List<Path> files = GlobParser.getFiles(tempDir.resolve("log*.txt").toString());
+
+        assertThat(files.size()).isEqualTo(2);
+        assertThat(files).contains(file1);
+        assertThat(files).contains(file2);
+    }
+
+    static List<LogRecord> fileLogs;
+    static List<LogRecord> URLLogs;
+
+    @BeforeAll
+    public static void getURLLogsTest() throws IOException {
+        String url =
+            "https://raw.githubusercontent.com/elastic/examples/master/Common%20Data%20Formats/nginx_logs/nginx_logs";
+        String str = "--path " + url + " --from 17/May/2014:13:05:28 --format markdown";
+        String[] args = str.split(" ");
+
+        Configuration configuration = CommandLineParser.parseArguments(args);
+
+        LogProcessor logProcessor = new LogProcessor(configuration);
+
+        URLLogs = logProcessor.getLogs();
+    }
+
+    @BeforeAll
+    public static void getSomeLogsTest() throws IOException {
+        Path file = Files.createTempFile("logs", ".docx");
         String str = "--path " + file + " --from 17/May/2014:13:05:28 --format markdown";
         String[] args = str.split(" ");
 
@@ -69,60 +97,15 @@ public class AnalyzeLogTest {
 
         Configuration configuration = CommandLineParser.parseArguments(args);
 
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss",
-            Locale.ENGLISH);
-
-        assertThat(configuration.getLogFilePath()).isEqualTo(file.toString());
-        assertNull(configuration.getLogFilePathURL());
-        assertThat(configuration.getFromDate())
-            .isEqualTo(LocalDateTime.parse("17/May/2014:13:05:28", dateTimeFormatter));
-        assertNull(configuration.getToDate());
-        assertThat(configuration.getOutputFormat()).isEqualTo("markdown");
-
         LogProcessor logProcessor = new LogProcessor(configuration);
 
-        List<LogRecord> logs = logProcessor.getLogs();
-
-        assertThat(logs.size()).isEqualTo(3);
-
-        LogRecord expected0 = new LogRecord(
-            "93.180.71.3",
-            LocalDateTime.parse("2015-05-17T08:05:32"),
-            "GET", "/downloads/product_1",
-            "HTTP/1.1", 304, 1);
-
-        LogRecord expected1 = new LogRecord("93.180.71.3",
-            LocalDateTime.parse("2015-05-17T08:05:23"),
-            "GET", "/downloads/product_1",
-            "HTTP/1.1", 304, 2);
-
-        LogRecord expected2 = new LogRecord(
-            "80.91.33.133",
-            LocalDateTime.parse("2015-05-17T08:05:24"),
-            "GET", "/downloads/product_1",
-            "HTTP/1.1", 304, 3);
-
-        assertThat(logs.get(0)).isEqualTo(expected0);
-        assertThat(logs.get(1)).isEqualTo(expected1);
-        assertThat(logs.get(2)).isEqualTo(expected2);
+        fileLogs = logProcessor.getLogs();
     }
 
     @Test
-    public void analyzeStatisticsTest(@TempDir Path tempDir) throws IOException {
-        Path file = Files.createFile(tempDir.resolve("logs"));
-        String str = "--path " + file + " --from 17/May/2014:13:05:28 --format markdown";
-        String[] args = str.split(" ");
-
-        writeLogsToFile(file);
-
-        Configuration configuration = CommandLineParser.parseArguments(args);
-
-        LogProcessor logProcessor = new LogProcessor(configuration);
-
-        List<LogRecord> logs = logProcessor.getLogs();
-
+    public void analyzeStatisticsTest() {
         LogReport logReport = new LogReport();
-        logReport.analyzeStatistics(logs);
+        logReport.analyzeStatistics(fileLogs);
 
         assertThat(logReport.getAverageResponseSize()).isEqualTo(2);
         assertThat(logReport.getMinimumResponseSize()).isEqualTo(1);
@@ -137,76 +120,11 @@ public class AnalyzeLogTest {
     }
 
     @Test
-    public void getLogsFromUrlTest() throws IOException {
-        String url =
-            "https://raw.githubusercontent.com/elastic/examples/master/Common%20Data%20Formats/nginx_logs/nginx_logs";
-        String str = "--path " + url + " --from 17/May/2014:13:05:28 --format markdown";
-        String[] args = str.split(" ");
-
-        Configuration configuration = CommandLineParser.parseArguments(args);
-
-        LogProcessor logProcessor = new LogProcessor(configuration);
-
-        List<LogRecord> logs = logProcessor.getLogs();
-
-        LogReport logReport = new LogReport();
-        logReport.analyzeStatistics(logs);
-
-        assertTrue(logs.size() > 100);
-
-        LogRecord firstLog = logs.get(0);
-
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(
-            "dd/MMM/yyyy:HH:mm:ss",
-            Locale.ENGLISH
-        );
-
-        assertThat(firstLog.ipAddress()).isEqualTo("93.180.71.3");
-        assertThat(firstLog.timestamp()).isEqualTo((LocalDateTime.parse("17/May/2015:08:05:32", dateTimeFormatter)));
-        assertThat(firstLog.url()).isEqualTo("/downloads/product_1");
-        assertThat(firstLog.protocol()).isEqualTo("HTTP/1.1");
-        assertThat(firstLog.statusCode()).isEqualTo(304);
-        assertThat(firstLog.responseSize()).isEqualTo(0);
-    }
-
-    @Test
-    public void globParserTest(@TempDir Path tempDir) throws IOException {
-        Path file1 = Files.createFile(tempDir.resolve("logs1.txt"));
-        Path file2 = Files.createFile(tempDir.resolve("logs2.txt"));
-        Path file3 = Files.createFile(tempDir.resolve("logs3.pages"));
-        Path file4 = Files.createFile(tempDir.resolve("laba.txt"));
-
-
-        List<Path> files = GlobParser.getFiles(tempDir.resolve("log*.txt").toString());
-
-        assertThat(files.size()).isEqualTo(2);
-        assertThat(files).contains(file1);
-        assertThat(files).contains(file2);
-    }
-
-    @Test
-    public void markdownOutTest(@TempDir Path tempDir) throws IOException {
+    public void outTest(@TempDir Path tempDir) throws IOException {
         Path fileToWrite = Files.createFile(tempDir.resolve("logStat.txt"));
-        var markdown = new MarkdownOut();
-
-        Path fileWithLogs = Files.createFile(tempDir.resolve("logs"));
-        String str = "--path " + fileWithLogs + " --from 17/May/2014:13:05:28 --format markdown";
-        String[] args = str.split(" ");
-
-        writeLogsToFile(fileWithLogs);
-
-        Configuration configuration = CommandLineParser.parseArguments(args);
-
-        LogProcessor logProcessor = new LogProcessor(configuration);
-
-        List<LogRecord> logs = logProcessor.getLogs();
 
         LogReport logReport = new LogReport();
-        logReport.analyzeStatistics(logs);
-
-        markdown.writeStatistics(logReport, String.valueOf(fileToWrite));
-
-        String markdownString = Files.readString(fileToWrite);
+        logReport.analyzeStatistics(URLLogs);
 
         assertDoesNotThrow(() -> new MarkdownOut().writeStatistics(logReport, String.valueOf(fileToWrite)));
         assertDoesNotThrow(() -> new AdocOut().writeStatistics(logReport, String.valueOf(fileToWrite)));

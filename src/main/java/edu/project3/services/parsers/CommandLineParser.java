@@ -21,9 +21,9 @@ public final class CommandLineParser {
                 case "--path" -> {
                     String logFilePath = args[++i];
                     if (logFilePath.startsWith("http")) {
-                        configuration.setLogFilePathURL(logFilePath);
+                        configuration.addLogFilesPathURL(logFilePath);
                     } else {
-                        configuration.setLogFilePath(logFilePath);
+                        configuration.addLogFilesPath(logFilePath);
                     }
                 }
                 case "--from" -> configuration.setFromDate(LocalDateTime.parse(args[++i], DATE_TIME_FORMATTER));

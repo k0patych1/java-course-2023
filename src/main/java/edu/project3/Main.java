@@ -22,6 +22,7 @@ public final class Main {
         List<LogRecord> logs = logProcessor.getLogs();
 
         LogReport logReport = new LogReport();
+        logReport.processingConfiguration(configuration);
         logReport.analyzeStatistics(logs);
 
         Path dirPath = Path.of(System.getProperty("user.dir"));

@@ -1,28 +1,35 @@
 package edu.project3.entities;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Configuration {
-    private String logFilePath;
-    private String logFilePathURL;
+    private final List<String> logFilesPath;
+    private final List<String> logFilesPathURL;
     private LocalDateTime fromDate;
     private LocalDateTime toDate;
     private String outputFormat = "markdown";
 
-    public String getLogFilePath() {
-        return logFilePath;
+    public Configuration() {
+        this.logFilesPath = new ArrayList<>();
+        this.logFilesPathURL = new ArrayList<>();
     }
 
-    public void setLogFilePath(String logFilePath) {
-        this.logFilePath = logFilePath;
+    public List<String> getLogFilesPath() {
+        return logFilesPath;
     }
 
-    public String getLogFilePathURL() {
-        return logFilePathURL;
+    public void addLogFilesPath(String logFilePath) {
+        logFilesPath.add(logFilePath);
     }
 
-    public void setLogFilePathURL(String logFilePathURL) {
-        this.logFilePathURL = logFilePathURL;
+    public List<String> getLogFilesPathURL() {
+        return logFilesPathURL;
+    }
+
+    public void addLogFilesPathURL(String logFilePathURL) {
+        logFilesPathURL.add(logFilePathURL);
     }
 
     public LocalDateTime getFromDate() {

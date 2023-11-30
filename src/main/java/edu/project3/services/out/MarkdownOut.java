@@ -3,47 +3,99 @@ package edu.project3.services.out;
 import edu.project3.entities.LogReport;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Map;
+import java.util.List;
 
 public class MarkdownOut implements IOut {
-    private static final String BYTES_FORMAT = "bytes%n%n";
-    private static final String INT_FORMAT = "%d";
-
-    public MarkdownOut() {}
-
+    @Override
     public void writeStatistics(LogReport logReport, String filePath) throws IOException {
+        StringBuilder output = new StringBuilder();
+
+        output.append("#### Общая информация\n\n");
+        output.append(generateGeneralInfoTable(logReport));
+        output.append("\n");
+
+        output.append("#### Запрашиваемые ресурсы\n\n");
+        output.append(generateResourceTable(logReport));
+        output.append("\n");
+
+        output.append("#### Коды ответа\n\n");
+        output.append(generateResponseCodeTable(logReport));
+        output.append("\n");
+
+        output.append("#### Протоколы\n\n");
+        output.append(generateProtocolTable(logReport));
+        output.append("\n");
+
         try (FileWriter writer = new FileWriter(filePath)) {
-            writer.write("# Log Report Statistics\n\n");
-
-            writer.write("## Total Requests\n\n");
-            writer.write(String.format(INT_FORMAT + "%n%n", logReport.getTotalRequests()));
-
-            writer.write("## Resource Frequency\n\n");
-            writeMap(logReport.getResourceFrequency(), writer);
-
-            writer.write("## Response Code Frequency\n\n");
-            writeMap(logReport.getResponseCodeFrequency(), writer);
-
-            writer.write("## Protocol Frequency\n\n");
-            writeMap(logReport.getProtocolFrequency(), writer);
-
-            writer.write("## Average Response Size\n\n");
-            writer.write(String.format("%.2f " + BYTES_FORMAT, logReport.getAverageResponseSize()));
-
-            writer.write("## Maximum Response Size\n\n");
-            writer.write(String.format(INT_FORMAT + " " + BYTES_FORMAT, logReport.getMaximumResponseSize()));
-
-            writer.write("## Minimum Response Size\n\n");
-            writer.write(String.format(INT_FORMAT + " " + BYTES_FORMAT, logReport.getMinimumResponseSize()));
-
-            writer.flush();
+            writer.write(output.toString());
         }
     }
 
-    private static <T> void writeMap(Map<T, Integer> map, FileWriter writer) throws IOException {
-        for (Map.Entry<T, Integer> entry : map.entrySet()) {
-            writer.write(String.format("- %s: " + INT_FORMAT + "%n", entry.getKey(), entry.getValue()));
+    private String generateGeneralInfoTable(LogReport logReport) {
+        StringBuilder table = new StringBuilder();
+        table.append("|           Метрика           | Значение |\n");
+        table.append("|:---------------------------:|---------:|\n");
+        table.append(String.format("|           Файл(-ы)          |   `%s`   |\n", getFieldText(logReport.getFiles())));
+        table.append(String.format("|          Ссылка(-и)         |   `%s`   |\n", getFieldText(logReport.getUrls())));
+        table.append(String.format("|        Начальная дата       |    %s    |\n", logReport.getFromDate()));
+        table.append(String.format("|         Конечная дата       |    %s    |\n", logReport.getToDate()));
+        table.append(String.format("|     Количество запросов     |    %d    |\n", logReport.getTotalRequests()));
+        table.append(String.format("|    Средний размер ответа    |   %.2f   |\n", logReport.getAverageResponseSize()));
+        table.append(String.format("| Максимальный размер ответа  |    %d    |\n", logReport.getMaximumResponseSize()));
+        table.append(String.format("|  Минимальный размер ответа  |    %d    |\n", logReport.getMinimumResponseSize()));
+
+        return table.toString();
+    }
+
+    private String generateResourceTable(LogReport logReport) {
+        StringBuilder table = new StringBuilder();
+
+        table.append("|     Ресурс      | Количество |\n");
+        table.append("|:---------------:|-----------:|\n");
+        for (String resource : logReport.getResourceFrequency().keySet()) {
+            table.append(String.format("|    `%s`    |    %d   |\n",
+                resource,
+                logReport.getResourceFrequency().get(resource)));
         }
-        writer.write("\n");
+
+        return table.toString();
+    }
+
+    private String generateResponseCodeTable(LogReport logReport) {
+        StringBuilder table = new StringBuilder();
+
+        table.append("| Код |          Имя          | Количество |\n");
+        table.append("|:---:|:---------------------:|-----------:|\n");
+        for (Integer value : logReport.getResponseCodeFrequency().keySet()) {
+            table.append(String.format("| %d |          %s           |  %d  |\n",
+                value,
+                getCodeName(value),
+                logReport.getResponseCodeFrequency().get(value)));
+        }
+
+        return table.toString();
+    }
+
+    private String generateProtocolTable(LogReport logReport) {
+        StringBuilder table = new StringBuilder();
+
+        table.append("| Протокол | Количество |\n");
+        table.append("|:--------:|:----------:|\n");
+        for (String value : logReport.getProtocolFrequency().keySet()) {
+            table.append(
+                String.format("| %s |    %d   |\n",
+                    value,
+                    logReport.getProtocolFrequency().get(value)));
+        }
+
+        return table.toString();
+    }
+
+    private String getFieldText(List<String> field) {
+        if (field == null || field.isEmpty()) {
+            return "-";
+        }
+
+        return String.join(", ", field);
     }
 }

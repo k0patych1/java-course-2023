@@ -23,20 +23,20 @@ public class LogProcessor {
 
     public List<LogRecord> getLogs() throws IOException {
         List<LogRecord> logs = new ArrayList<>();
-        String logFilePath = configuration.getLogFilePath();
+        List<String> logsFilePath = configuration.getLogFilesPath();
         LocalDateTime fromDate = configuration.getFromDate();
         LocalDateTime toDate = configuration.getToDate();
-        String urlLogs = configuration.getLogFilePathURL();
+        List<String> urlLogs = configuration.getLogFilesPathURL();
 
-        if (urlLogs != null) {
+        for (String log : urlLogs) {
             try (BufferedReader brUrl = new BufferedReader(
-                new InputStreamReader((new URL(urlLogs)).openStream()))) {
+                new InputStreamReader((new URL(log)).openStream()))) {
                 logs.addAll(LogsParser.parseLogsFromBuffer(brUrl, fromDate, toDate));
             }
         }
 
-        if (logFilePath != null) {
-            List<Path> logFilePaths = GlobParser.getFiles(logFilePath);
+        for (String log : logsFilePath) {
+            List<Path> logFilePaths = GlobParser.getFiles(log);
 
             for (Path logFile : logFilePaths) {
                 try (BufferedReader brFile = Files.newBufferedReader(logFile)) {
