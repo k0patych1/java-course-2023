@@ -16,7 +16,7 @@ public class LogReport {
 
     private LocalDateTime toDate;
 
-    private long totalRequests = 0;
+    private int totalRequests = 0;
 
     private final Map<String, Integer> resourceFrequency = new HashMap<>();
 
@@ -24,11 +24,11 @@ public class LogReport {
 
     private final Map<String, Integer> protocolFrequency = new HashMap<>();
 
-    private long totalResponseSize = 0;
+    private int totalResponseSize = 0;
 
-    private long maximumResponseSize = Integer.MIN_VALUE;
+    private int maximumResponseSize = Integer.MIN_VALUE;
 
-    private long minimumResponseSize = Integer.MAX_VALUE;
+    private int minimumResponseSize = Integer.MAX_VALUE;
 
     public void processingConfiguration(Configuration configuration) {
         this.files = configuration.getLogFilesPath();
