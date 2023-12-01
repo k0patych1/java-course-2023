@@ -7,13 +7,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MonteCarloPiTest {
     @ParameterizedTest
     @ValueSource(ints = {10_000_000, 100_000_000, 1_000_000_000})
-    public void MonteCarloPiPerformanceTest(int iterations) throws InterruptedException {
-        long timeStartSingleThread = System.currentTimeMillis();
+    public void MonteCarloPiPerformanceTest(int iterations) {
+        long timeStartSingleThread = System.nanoTime();
         double receivedBySingleThreadPi = MonteCarloPi.calculatePiByOneThread(iterations);
-        long timeEndSingleThread = System.currentTimeMillis();
+        long timeEndSingleThread = System.nanoTime();
 
         double receivedByMultiThreadPi = MonteCarloPi.calculatePiBySeveralThreads(iterations);
-        long timeEndMultiThread = System.currentTimeMillis();
+        long timeEndMultiThread = System.nanoTime();
 
         assertTrue(Math.abs(Math.PI - receivedByMultiThreadPi) < 1e6);
         assertTrue(Math.abs(Math.PI - receivedBySingleThreadPi) < 1e6);
