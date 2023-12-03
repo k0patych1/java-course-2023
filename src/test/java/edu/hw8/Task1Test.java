@@ -18,9 +18,9 @@ public class Task1Test {
         int numOfThreads = Runtime.getRuntime().availableProcessors();
         ExecutorService executorService = Executors.newFixedThreadPool(numOfThreads);
 
-        CompletableFuture<Void> serverStartFuture = CompletableFuture.runAsync(new Server(), executorService);
+        executorService.submit(new Server());
 
-        serverStartFuture.get();
+        Thread.sleep(2000);
 
         List<CompletableFuture<String>> futures = new ArrayList<>();
 

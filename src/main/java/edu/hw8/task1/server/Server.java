@@ -33,41 +33,6 @@ public class Server implements Runnable {
         };
     }
 
-    @SuppressWarnings("UncommentedMain")
-    public static void main(String[] args) throws IOException {
-        try (ExecutorService executorService = Executors.newFixedThreadPool(MAX_SIMULTANEOUS_CONNECTIONS);
-             Selector selector = Selector.open();
-             ServerSocketChannel serverSocket = ServerSocketChannel.open()) {
-            serverSocket.bind(new InetSocketAddress("localhost", PORT));
-            serverSocket.configureBlocking(false);
-            serverSocket.register(selector, SelectionKey.OP_ACCEPT);
-            while (true) {
-                selector.select();
-                Set<SelectionKey> selectedKeys = selector.selectedKeys();
-                Iterator<SelectionKey> iter = selectedKeys.iterator();
-                while (iter.hasNext()) {
-
-                    SelectionKey key = iter.next();
-
-                    if (key.isAcceptable()) {
-                        register(selector, serverSocket);
-                    }
-
-                    if (key.isReadable()) {
-                        executorService.submit(() -> {
-                            try {
-                                sendAnswer(key);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        });
-                    }
-                    iter.remove();
-                }
-            }
-        }
-    }
-
     private static void register(Selector selector, ServerSocketChannel serverSocket)
         throws IOException {
 
@@ -100,15 +65,36 @@ public class Server implements Runnable {
 
     @Override
     public void run() {
-        String javaHome = System.getProperty("java.home");
-        String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
-        String classpath = System.getProperty("java.class.path");
-        String className = Server.class.getCanonicalName();
+        try (ExecutorService executorService = Executors.newFixedThreadPool(MAX_SIMULTANEOUS_CONNECTIONS);
+             Selector selector = Selector.open();
+             ServerSocketChannel serverSocket = ServerSocketChannel.open()) {
+            serverSocket.bind(new InetSocketAddress("localhost", PORT));
+            serverSocket.configureBlocking(false);
+            serverSocket.register(selector, SelectionKey.OP_ACCEPT);
+            while (true) {
+                selector.select();
+                Set<SelectionKey> selectedKeys = selector.selectedKeys();
+                Iterator<SelectionKey> iter = selectedKeys.iterator();
+                while (iter.hasNext()) {
 
-        ProcessBuilder builder = new ProcessBuilder(javaBin, "-cp", classpath, className);
+                    SelectionKey key = iter.next();
 
-        try {
-            builder.start();
+                    if (key.isAcceptable()) {
+                        register(selector, serverSocket);
+                    }
+
+                    if (key.isReadable()) {
+                        executorService.submit(() -> {
+                            try {
+                                sendAnswer(key);
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
+                    }
+                    iter.remove();
+                }
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
