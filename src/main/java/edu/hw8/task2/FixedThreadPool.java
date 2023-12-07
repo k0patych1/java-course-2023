@@ -2,9 +2,16 @@ package edu.hw8.task2;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class FixedThreadPool implements ThreadPool {
     private static final String CLOSED_THREAD_POOL_EXCEPTION = "Thread pool was closed";
+
+    private static final int TIMEOUT_TO_EXECUTION = 1000;
+
+    private static final int TIMEOUT_TO_OFFER = 1;
+
     private final BlockingQueue<Runnable> workQueue;
 
     private final int threadCount;
@@ -23,7 +30,7 @@ public class FixedThreadPool implements ThreadPool {
     @Override
     public void start() {
         if (isClosed) {
-            throw new RuntimeException(CLOSED_THREAD_POOL_EXCEPTION);
+            throw new RejectedExecutionException(CLOSED_THREAD_POOL_EXCEPTION);
         }
         for (int i = 0; i < threadCount; ++i) {
             threads[i] = new Thread(new Worker());
@@ -34,11 +41,13 @@ public class FixedThreadPool implements ThreadPool {
     @Override
     public void execute(Runnable runnable) {
         if (isClosed) {
-            throw new RuntimeException(CLOSED_THREAD_POOL_EXCEPTION);
+            throw new RejectedExecutionException(CLOSED_THREAD_POOL_EXCEPTION);
         }
 
         try {
-            workQueue.put(runnable);
+            if (!workQueue.offer(runnable, TIMEOUT_TO_OFFER, TimeUnit.SECONDS)) {
+                throw new RejectedExecutionException("Failed to add task to the queue within timeout");
+            }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -47,13 +56,18 @@ public class FixedThreadPool implements ThreadPool {
     @Override
     public void close() {
         if (isClosed) {
-            throw new RuntimeException(CLOSED_THREAD_POOL_EXCEPTION);
+            throw new RejectedExecutionException(CLOSED_THREAD_POOL_EXCEPTION);
         }
 
         isClosed = true;
-        while (!workQueue.isEmpty()) {
+        long endTime = System.currentTimeMillis() + TIMEOUT_TO_EXECUTION;
 
+        while (!workQueue.isEmpty() && System.currentTimeMillis() < endTime) {}
+
+        if (!workQueue.isEmpty()) {
+            workQueue.clear();
         }
+
 
         for (int i = 0; i < threadCount; ++i) {
             if (threads[i] != null) {

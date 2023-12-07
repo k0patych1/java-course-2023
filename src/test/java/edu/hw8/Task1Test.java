@@ -23,10 +23,12 @@ public class Task1Test {
         Thread.sleep(2000);
 
         List<CompletableFuture<String>> futures = new ArrayList<>();
+        List<Client> clients = new ArrayList<>();
 
 
         for (int i = 0; i < numOfThreads; ++i) {
             Client client = new Client();
+            clients.add(client);
             CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
                 try {
                     return client.sendMessage("интеллект");
@@ -39,9 +41,14 @@ public class Task1Test {
 
         CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
         allFutures.join();
+        Server.close();
 
         for (CompletableFuture<String> future : futures) {
             assertThat(future.get()).isEqualTo("Чем ниже интеллект, тем громче оскорбления");
+        }
+
+        for (Client client : clients) {
+            client.stop();
         }
     }
 }

@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Server implements Runnable {
     private static final int PORT = 1357;
@@ -19,6 +20,8 @@ public class Server implements Runnable {
     private static final int MAX_SIMULTANEOUS_CONNECTIONS = 1000;
 
     private static final int BUFFER_CAPACITY = 1024;
+
+    private static final AtomicBoolean IS_RUNNING = new AtomicBoolean(true);
 
     private static String getAnswer(String question) {
         return switch (question) {
@@ -70,7 +73,7 @@ public class Server implements Runnable {
             serverSocket.bind(new InetSocketAddress("localhost", PORT));
             serverSocket.configureBlocking(false);
             serverSocket.register(selector, SelectionKey.OP_ACCEPT);
-            while (true) {
+            while (IS_RUNNING.get()) {
                 selector.select();
                 Set<SelectionKey> selectedKeys = selector.selectedKeys();
                 Iterator<SelectionKey> iter = selectedKeys.iterator();
@@ -97,5 +100,9 @@ public class Server implements Runnable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static void close() {
+        IS_RUNNING.set(false);
     }
 }
