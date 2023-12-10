@@ -91,10 +91,10 @@ public class Task3Test {
             var it = ds.iterator();
             assertTrue(it.hasNext());
             assertThat(it.next().getFileName().toString())
-                .isEqualTo("file2.png");
+                .isEqualTo("file1.txt");
             assertTrue(it.hasNext());
             assertThat(it.next().getFileName().toString())
-                .isEqualTo("file1.txt");
+                .isEqualTo("file2.png");
             assertFalse(it.hasNext());
         }
     }
