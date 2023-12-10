@@ -24,7 +24,7 @@ public class MultiThreadFractalFlameGenerator extends FractalFlameGenerator {
     }
 
     @Override
-    public FractalFlame generate() throws RejectedExecutionException, InterruptedException {
+    public FractalFlame generate() throws RejectedExecutionException {
         Pixel[][] pixels = initPixels();
 
         CountDownLatch latch = new CountDownLatch(numOfPoints);
@@ -38,7 +38,7 @@ public class MultiThreadFractalFlameGenerator extends FractalFlameGenerator {
             }
         }
 
-        latch.await();
+        latch.countDown();
 
         Correction.correct(pixels, width, height);
 
