@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class FractalFrameGenerationTest {
     @Test
     public void perfomanceTest(@TempDir Path tempdir) throws ExecutionException, InterruptedException, IOException {
-        tempdir = Path.of("/Users/ruslan/dev/java-course-2023/src/test/java/edu/project4/");
         List<AffineTransformation> affineTransformations = new ArrayList<>();
         List<NonLinearTransformation> nonLinearTransformations = new ArrayList<>();
         int numOfAffineTransformations = 3;
