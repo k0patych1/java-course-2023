@@ -40,13 +40,11 @@ public class Task2Test {
 
         LargeDirectoriesFilter filter = new LargeDirectoriesFilter(root.toFile(), 1);
 
-        try (var forkJoinPool = new ForkJoinPool()) {
-            List<File> answer = forkJoinPool.invoke(filter);
-            assertThat(answer.size()).isEqualTo(3);
-            assertTrue(answer.contains(root.toFile()));
-            assertTrue(answer.contains(childDir1.toFile()));
-            assertTrue(answer.contains(childChildDir.toFile()));
-        }
+        List<File> answer = filter.getAnswer();
+        assertThat(answer.size()).isEqualTo(3);
+        assertTrue(answer.contains(root.toFile()));
+        assertTrue(answer.contains(childDir1.toFile()));
+        assertTrue(answer.contains(childChildDir.toFile()));
     }
 
     @Test
@@ -74,14 +72,11 @@ public class Task2Test {
 
         var predicate = new Predicate("pages", 0);
         PredicateFileFilter filter = new PredicateFileFilter(root.toFile(), predicate);
-        try (var forkJoinPool = new ForkJoinPool()) {
-            List<File> answer = forkJoinPool.invoke(filter);
-            filter.invoke();
-            assertThat(answer.size()).isEqualTo(4);
-            assertTrue(answer.contains(goodFile1.toFile()));
-            assertTrue(answer.contains(goodFile2.toFile()));
-            assertTrue(answer.contains(goodFile3.toFile()));
-            assertTrue(answer.contains(goodFile4.toFile()));
-        }
+        List<File> answer = filter.getAnswer();
+        assertThat(answer.size()).isEqualTo(4);
+        assertTrue(answer.contains(goodFile1.toFile()));
+        assertTrue(answer.contains(goodFile2.toFile()));
+        assertTrue(answer.contains(goodFile3.toFile()));
+        assertTrue(answer.contains(goodFile4.toFile()));
     }
 }

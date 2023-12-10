@@ -3,6 +3,7 @@ package edu.hw9.task2;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
 public class LargeDirectoriesFilter extends RecursiveTask<List<File>> {
@@ -47,5 +48,11 @@ public class LargeDirectoriesFilter extends RecursiveTask<List<File>> {
         }
 
         return directoriesWithMoreThanRequired;
+    }
+
+    public List<File> getAnswer() {
+        try (var forkJoinPool = new ForkJoinPool()) {
+            return forkJoinPool.invoke(this);
+        }
     }
 }

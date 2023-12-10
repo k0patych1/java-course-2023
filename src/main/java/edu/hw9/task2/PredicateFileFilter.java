@@ -3,6 +3,7 @@ package edu.hw9.task2;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
 public class PredicateFileFilter extends RecursiveTask<List<File>> {
@@ -40,6 +41,12 @@ public class PredicateFileFilter extends RecursiveTask<List<File>> {
         }
 
         return filesWithRequiredPredicate;
+    }
+
+    public List<File> getAnswer() {
+        try (var forkJoinPool = new ForkJoinPool()) {
+            return forkJoinPool.invoke(this);
+        }
     }
 
     private static String fileExtension(File file) {
