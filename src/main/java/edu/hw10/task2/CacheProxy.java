@@ -8,7 +8,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 public final class CacheProxy implements InvocationHandler {
@@ -18,17 +17,17 @@ public final class CacheProxy implements InvocationHandler {
 
     private final Map<String, Object> memoryCache;
 
-    private CacheProxy(Object target, Path cachePath) {
+    private CacheProxy(Object target, Path cachePath, Map<String, Object> memoryCache) {
         this.target = target;
         this.cachePath = cachePath;
-        memoryCache = new HashMap<>();
+        this.memoryCache = memoryCache;
     }
 
-    public static <T> T create(T target, Class<?> targetClass, Path cachePath) {
+    public static <T> T create(T target, Class<?> targetClass, Path cachePath, Map<String, Object> memoryCache) {
         return (T) Proxy.newProxyInstance(
             targetClass.getClassLoader(),
             targetClass.getInterfaces(),
-            new CacheProxy(target, cachePath));
+            new CacheProxy(target, cachePath, memoryCache));
     }
 
     @Override
