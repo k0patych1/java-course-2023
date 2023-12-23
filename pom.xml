@@ -140,8 +140,7 @@
             <version>2.13.0</version>
         </dependency>
 
-
-         </dependency>
+         <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm</artifactId>
             <version>${asm.version}</version>
@@ -152,6 +151,7 @@
             <artifactId>byte-buddy-agent</artifactId>
             <version>${bytebuddy.version}</version>
         </dependency>
+
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
