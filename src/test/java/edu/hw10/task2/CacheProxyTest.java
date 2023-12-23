@@ -5,19 +5,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class CacheProxyTest {
     @Test
-    public void cacheProxyInMemoryTest(@TempDir Path tempDir) {
+    public void cacheProxyInMemoryTest(@TempDir Path tempDir) throws IOException {
         Path cachePath = tempDir.resolve("persist.json");
 
-        Map<String, Object> memoryCache = new HashMap<>();
-        IFibCalculator fibCalculator = CacheProxy.create(new FibCalculator(), FibCalculator.class, cachePath, memoryCache);
+        IFibCalculator fibCalculator = CacheProxy.create(new FibCalculator(), FibCalculator.class, cachePath);
 
         long value = fibCalculator.fib(40);
         long cachedValue = fibCalculator.fib(40);
@@ -30,8 +27,7 @@ public class CacheProxyTest {
         Path cachePath = tempDir.resolve("persist.json");
         Files.createFile(cachePath);
 
-        Map<String, Object> memoryCache = new HashMap<>();
-        IFibCalculator fibCalculator = CacheProxy.create(new FibCalculator(), FibCalculator.class, cachePath, memoryCache);
+        IFibCalculator fibCalculator = CacheProxy.create(new FibCalculator(), FibCalculator.class, cachePath);
 
         long firstValue = fibCalculator.fib(40);
         long secondValue = fibCalculator.fib(10);
@@ -40,5 +36,10 @@ public class CacheProxyTest {
         JsonNode jsonNode = mapper.readTree(cachePath.toFile());
         assertThat(jsonNode.get("fib[40]").asLong()).isEqualTo(firstValue);
         assertThat(jsonNode.get("fib[10]").asLong()).isEqualTo(secondValue);
+
+        IFibCalculator nextFibCalculator = CacheProxy.create(new FibCalculator(), FibCalculator.class, cachePath);
+
+        assertThat(nextFibCalculator.fib(40)).isEqualTo(firstValue);
+        assertThat(nextFibCalculator.fib(10)).isEqualTo(secondValue);
     }
 }

@@ -1,5 +1,6 @@
 package edu.hw10.task2;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
@@ -8,6 +9,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public final class CacheProxy implements InvocationHandler {
@@ -17,17 +20,25 @@ public final class CacheProxy implements InvocationHandler {
 
     private final Map<String, Object> memoryCache;
 
-    private CacheProxy(Object target, Path cachePath, Map<String, Object> memoryCache) {
+    private CacheProxy(Object target, Path cachePath) throws IOException {
         this.target = target;
         this.cachePath = cachePath;
-        this.memoryCache = memoryCache;
+        this.memoryCache = new HashMap<>();
+        if (cachePath.toFile().exists()) {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode jsonNode = mapper.readTree(cachePath.toFile());
+            for (Iterator<String> it = jsonNode.fieldNames(); it.hasNext();) {
+                String fieldName = it.next();
+                memoryCache.put(fieldName, jsonNode.get(fieldName).asLong());
+            }
+        }
     }
 
-    public static <T> T create(T target, Class<?> targetClass, Path cachePath, Map<String, Object> memoryCache) {
+    public static <T> T create(T target, Class<?> targetClass, Path cachePath) throws IOException {
         return (T) Proxy.newProxyInstance(
             targetClass.getClassLoader(),
             targetClass.getInterfaces(),
-            new CacheProxy(target, cachePath, memoryCache));
+            new CacheProxy(target, cachePath));
     }
 
     @Override
