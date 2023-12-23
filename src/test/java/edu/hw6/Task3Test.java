@@ -76,6 +76,28 @@ public class Task3Test {
     }
 
     @Test
+    public void regexContainsFilterTest(@TempDir Path tempDir) throws IOException {
+        var file1 = tempDir.resolve("file1.txt");
+        Files.createFile(file1);
+        var file2 = tempDir.resolve("file2.png");
+        Files.createFile(file2);
+        var file3 = tempDir.resolve("file3.jpg");
+        Files.createFile(file3);
+
+        AbstractFilter filter = regular()
+            .and(regexContains("[12]"));
+
+        try (DirectoryStream<Path> ds = Files.newDirectoryStream(tempDir, filter)) {
+            var it = ds.iterator();
+            assertTrue(it.hasNext());
+            it.next();
+            assertTrue(it.hasNext());
+            it.next();
+            assertFalse(it.hasNext());
+        }
+    }
+
+    @Test
     public void multipleFiltersTest(@TempDir Path tempDir) throws IOException {
         var file1 = tempDir.resolve("file1.txt");
         Files.createFile(file1);
